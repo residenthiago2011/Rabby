@@ -2,6 +2,7 @@ import React from 'react';
 import { connectStore, useRabbyDispatch, useRabbySelector } from 'ui/store';
 import RiskCheck from './RiskCheck';
 import DisplayMnemonic from './DisplayMnemonic';
+import VerifyMnemonics from './VerifyMnemonics';
 import { useTranslation } from 'react-i18next';
 
 const CreateMnemonic = () => {
@@ -20,11 +21,14 @@ const CreateMnemonic = () => {
     case 'display':
       node = <DisplayMnemonic />;
       break;
+    case 'verify':
+      node = <VerifyMnemonics />;
+      break;
     default:
       throw new Error(t('page.newAddress.seedPhrase.importError'));
   }
 
-  return <div className="w-screen h-screen bg-r-neutral-bg-2">{node}</div>;
+  return <div className="w-screen h-screen bg-gray-bg">{node}</div>;
 };
 
 export default connectStore()(CreateMnemonic);

@@ -89,20 +89,12 @@ export const useTokenPair = (userAddress: string) => {
   const dispatch = useRabbyDispatch();
   const refreshId = useRefreshId();
 
-  const {
-    initialSelectedChain,
-    oChain,
-    defaultSelectedFromToken,
-    defaultSelectedToToken,
-  } = useRabbySelector((state) => {
+  const { initialSelectedChain, oChain } = useRabbySelector((state) => {
     return {
       initialSelectedChain: state.swap.$$initialSelectedChain,
       oChain: state.swap.selectedChain || CHAINS_ENUM.ETH,
-      defaultSelectedFromToken: state.swap.selectedFromToken,
-      defaultSelectedToToken: state.swap.selectedToToken,
     };
   });
-
   const [chain, setChain] = useState(oChain);
   const handleChain = (c: CHAINS_ENUM) => {
     setChain(c);
@@ -123,21 +115,12 @@ export const useTokenPair = (userAddress: string) => {
   const [payToken, setPayToken] = useTokenInfo({
     userAddress,
     chain,
-    defaultToken: defaultSelectedFromToken || getChainDefaultToken(chain),
+    defaultToken: getChainDefaultToken(chain),
   });
   const [receiveToken, setReceiveToken] = useTokenInfo({
     userAddress,
     chain,
-    defaultToken: defaultSelectedToToken,
   });
-
-  useEffect(() => {
-    dispatch.swap.setSelectedFromToken(payToken);
-  }, [payToken]);
-
-  useEffect(() => {
-    dispatch.swap.setSelectedToToken(receiveToken);
-  }, [receiveToken]);
 
   const [payAmount, setPayAmount] = useState('');
 
@@ -416,7 +399,6 @@ export const useTokenPair = (userAddress: string) => {
           ...getChainDefaultToken(target?.enum),
           id: searchObj.payTokenId,
         });
-        setReceiveToken(undefined);
       }
     }
   }, [searchObj?.chain, searchObj?.payTokenId]);

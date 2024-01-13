@@ -11,7 +11,7 @@ const GasReservedDiv = styled.div`
   font-size: 12px;
   line-height: 14px;
   text-align: right;
-  color: var(--r-neutral-foot, #6a7587);
+  color: #707280;
   flex: 1;
   display: flex;
   align-items: center;

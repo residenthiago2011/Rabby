@@ -4,7 +4,7 @@ import { AbstractPortfolio } from 'ui/utils/portfolio/types';
 import { DisplayedProject } from 'ui/utils/portfolio/project';
 import { IconWithChain } from '@/ui/component/TokenWithChain';
 import PortfolioTemplate from './ProtocolTemplates';
-import { ReactComponent as RcIconDropdown } from '@/ui/assets/dashboard/dropdown.svg';
+import { ReactComponent as IconDropdown } from '@/ui/assets/dashboard/dropdown.svg';
 import clsx from 'clsx';
 import { useCommonPopupView } from '@/ui/utils';
 
@@ -48,7 +48,7 @@ const PoolItem = ({ item }: { item: AbstractPortfolio }) => {
 };
 
 const ProtocolItemWrapper = styled.div`
-  background: var(--r-neutral-card-2, #f2f4f7);
+  background: #f5f6fa;
   margin-bottom: 12px;
   border-radius: 6px;
 
@@ -63,7 +63,7 @@ const ProtocolItemWrapper = styled.div`
       font-weight: 500;
       font-size: 13px;
       line-height: 15px;
-      color: var(--r-neutral-title-1, #192945);
+      color: #13141a;
       margin-left: 8px;
     }
     .net-worth {
@@ -71,7 +71,7 @@ const ProtocolItemWrapper = styled.div`
       font-size: 13px;
       line-height: 15px;
       text-align: right;
-      color: var(--r-neutral-title-1, #192945);
+      color: #13141a;
     }
   }
 `;
@@ -133,7 +133,7 @@ const ProtocolItem = ({
           />
           <span className="name">{protocol.name}</span>
           <span className="net-worth">{protocol._netWorth}</span>
-          <RcIconDropdown
+          <IconDropdown
             className={clsx('ml-8', {
               'transform rotate-180': isExpand,
             })}

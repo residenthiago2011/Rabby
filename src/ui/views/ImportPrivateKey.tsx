@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Input, Form, message } from 'antd';
+import { Input, Form } from 'antd';
 import { useHistory } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { KEYRING_TYPE } from 'consts';
-import IconSuccess from 'ui/assets/success.svg';
 
 import { Navbar, StrayPageWithButton } from 'ui/component';
 import { useWallet, useWalletRequest } from 'ui/utils';
@@ -18,7 +17,7 @@ const TipTextList = styled.div`
     font-weight: 700;
     font-size: 13px;
     line-height: 15px;
-    color: var(--r-neutral-title-1, #f7fafc);
+    color: #13141a;
     margin-top: 0;
     margin-bottom: 8px;
   }
@@ -26,7 +25,7 @@ const TipTextList = styled.div`
     font-weight: 400;
     font-size: 13px;
     line-height: 15px;
-    color: var(--r-neutral-body, #d3d8e0);
+    color: #4b4d59;
     margin: 0;
   }
   section + section {
@@ -133,7 +132,7 @@ const ImportPrivateKey = () => {
         >
           {t('page.newAddress.importPrivateKey')}
         </Navbar>
-        <div className="rabby-container widget-has-ant-input">
+        <div className="rabby-container">
           <div className="px-20 pt-24">
             <Form.Item
               name="key"
@@ -150,16 +149,6 @@ const ImportPrivateKey = () => {
                 autoFocus
                 spellCheck={false}
                 type="password"
-                onPaste={() => {
-                  clearClipboard();
-                  message.success({
-                    icon: (
-                      <img src={IconSuccess} className="icon icon-success" />
-                    ),
-                    content: t('page.newAddress.seedPhrase.pastedAndClear'),
-                    duration: 2,
-                  });
-                }}
               />
             </Form.Item>
             <TipTextList className="mt-32">
@@ -196,7 +185,7 @@ const ImportPrivateKey = () => {
                   >
                     Yes, you can
                     <a
-                      className="underline text-r-blue-default cursor-pointer"
+                      className="underline text-blue-light cursor-pointer"
                       onClick={() => history.push('/import/json')}
                     >
                       import KeyStore

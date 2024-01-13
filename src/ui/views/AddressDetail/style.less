@@ -15,7 +15,7 @@
       font-weight: 400;
       font-size: 12px;
       line-height: 14px;
-      color: var(--r-neutral-body, #3e495e);
+      color: #4b4d59;
       position: relative;
       cursor: pointer;
 
@@ -46,7 +46,7 @@
   }
   .rabby-list {
     border-radius: 6px;
-    background-color: var(--r-neutral-card-1, #fff);
+    background-color: #fff;
     margin-bottom: 20px;
     &-item {
       padding-left: 16px;
@@ -62,7 +62,7 @@
         font-weight: 500;
         font-size: 14px;
         line-height: 16px;
-        color: var(--r-neutral-title-1, #192945);
+        color: @color-title;
         gap: 4px;
         display: flex;
         flex-direction: column;
@@ -75,7 +75,7 @@
         font-weight: 400;
         font-size: 14px;
         line-height: 16px;
-        color: var(--r-neutral-body, #3e495e);
+        color: @color-body;
       }
       &-extra {
         max-width: 230px;
@@ -86,7 +86,7 @@
       &-arrow {
         svg {
           path {
-            fill: var(--r-neutral-foot, #6a7587);
+            fill: @color-comment-1;
           }
         }
       }
@@ -102,21 +102,13 @@
         margin-right: 16px;
       }
       & > div:last-child {
-        border-bottom: 1px solid var(--r-neutral-line, #d3d8e0);
-        border-bottom: 0.5px solid var(--r-neutral-line, #d3d8e0);
+        border-bottom: 1px solid #e5e9ef;
+        border-bottom: 0.5px solid #e5e9ef;
       }
       &:last-child {
         div {
           border: none;
         }
-      }
-
-      .name-and-address .name {
-        color: var(--r-neutral-body, #3e495e);
-      }
-
-      .name-and-address .address {
-        color: var(--r-neutral-foot, #6a7587);
       }
     }
   }
@@ -127,7 +119,7 @@
     font-weight: 400;
     font-size: 14px;
     line-height: 20px;
-    color: var(--r-neutral-body, #D3D8E0);
+    color: @color-body;
     margin-bottom: 20px;
   }
 

@@ -1,6 +1,6 @@
 @import '../../style/var.less';
 .wallet-connect {
-  background: var(--r-neutral-bg-2, #f2f4f7);
+  background: @color-bg;
   position: relative;
   height: 100%;
   overflow: auto;
@@ -15,25 +15,21 @@
   width: 148px;
   height: 32px;
   margin: 32px auto 24px;
-  background: var(--r-neutral-line, #d3d8e0);
+  background: #ffffff;
   display: flex;
-  border-radius: 6px;
+  border-radius: 4px;
   div {
     width: 72px;
     height: 28px;
     margin: 2px;
     padding: 3px;
-    border-radius: 4px;
-    color: var(--r-neutral-body, #3e495e);
+    border-radius: 3px;
+    color: @color-comment-1;
     text-align: center;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .active {
-    background: var(--r-neutral-bg-1, #fff);
-    color: var(--r-blue-default, #7084ff);
+    background: var(--r-blue-default, #7084ff);
+    color: #ffffff;
   }
 }
 .goback {
@@ -83,9 +79,8 @@
   position: relative;
   border-radius: 4px;
   .ant-input-disabled {
-    color: var(--r-neutral-title-1);
-    background: var(--r-neutral-card-1);
-    border-color: var(--r-neutral-line);
+    color: rgba(0, 0, 0, 0.85);
+    background: #ffffff;
     cursor: default;
   }
 }

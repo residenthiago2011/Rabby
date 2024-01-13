@@ -25,7 +25,7 @@ const Description = styled.p`
   font-size: 12px;
   line-height: 16px;
   text-align: center;
-  color: var(--r-neutral-foot, #babec5);
+  color: #707280;
   margin: 0 0 30px;
 `;
 
@@ -99,7 +99,6 @@ const GasSelector = ({
       front_tx_count: 0,
       estimated_seconds: 0,
       base_fee: gasList[0].base_fee,
-      priority_price: null,
     };
     setSelectedGas({
       ...gas,
@@ -116,7 +115,6 @@ const GasSelector = ({
         front_tx_count: 0,
         estimated_seconds: 0,
         base_fee: 0,
-        priority_price: null,
       });
     }
   }, [customGas]);
@@ -135,14 +133,13 @@ const GasSelector = ({
       placement="bottom"
       className="send-token-gas-selector"
       closable={false}
-      isSupportDarkMode
     >
       <Description>
         {/* The gas cost will be reserved from the transfer amount based on the gas
         price you set */}
         {t('page.sendToken.GasSelector.popupDesc')}
       </Description>
-      <div className="gas-selector">
+      <div className="gas-selector gray-section-block">
         <div className="top">
           <p className="usmoney">
             ≈ $

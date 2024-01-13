@@ -44,7 +44,7 @@ const TokenCost = ({
   return (
     <div
       className={clsx(
-        'flex items-center text-13 text-r-neutral-title-1',
+        'flex items-center text-13 text-gray-title',
         !actual && 'opacity-60'
       )}
     >
@@ -120,12 +120,12 @@ const Transaction = forwardRef<HTMLDivElement, TransactionProps>(
     return (
       <div
         className={clsx(
-          'bg-r-neutral-card-2 rounded-[6px] p-12 relative text-12 text-r-neutral-body'
+          'bg-gray-bg rounded-[6px] p-12 relative text-12 text-gray-subTitle'
         )}
         ref={ref}
       >
-        <div className="flex justify-between items-center pb-8 border-b border-solid border-rabby-neutral-line">
-          <div className="flex items-center text-12 font-medium text-r-neutral-title-1">
+        <div className="flex justify-between items-center pb-8 border-b border-solid border-gray-divider">
+          <div className="flex items-center text-12 font-medium text-gray-title">
             {isPending && (
               <TooltipWithMagnetArrow title={t('page.swap.pendingTip')}>
                 <div className="flex items-center">
@@ -149,7 +149,7 @@ const Transaction = forwardRef<HTMLDivElement, TransactionProps>(
             <span>{!isPending && sinceTime(time)}</span>
           </div>
           {!!targetDex && (
-            <span className="text-12 font-medium text-r-neutral-title-1">
+            <span className="text-12 font-medium text-gray-title">
               {targetDex}
             </span>
           )}
@@ -195,10 +195,10 @@ const Transaction = forwardRef<HTMLDivElement, TransactionProps>(
           </div>
         </div>
 
-        <div className="flex items-center text-12 text-r-neutral-foot pt-10 border-t border-solid border-rabby-neutral-line">
+        <div className="flex items-center text-12 text-gray-content pt-10 border-t border-solid border-gray-divider">
           <span className="cursor-pointer" onClick={gotoScan}>
             {chainName}:{' '}
-            <span className="underline underline-r-neutral-foot">
+            <span className="underline underline-gray-content">
               {ellipsis(txId)}
             </span>
           </span>
@@ -230,7 +230,7 @@ const HistoryList = () => {
           src={ImgEmpty}
           className="w-[52px] h-[52px] mx-auto mt-[112px] mb-24"
         />
-        <p className="text-center text-r-neutral-foot text-14">
+        <p className="text-center text-gray-content text-14">
           {t('page.swap.no-transaction-records')}
         </p>
       </div>
@@ -278,7 +278,6 @@ export const SwapTxHistory = ({
         paddingBottom: 0,
       }}
       destroyOnClose
-      isSupportDarkMode
     >
       <HistoryList />
     </Popup>

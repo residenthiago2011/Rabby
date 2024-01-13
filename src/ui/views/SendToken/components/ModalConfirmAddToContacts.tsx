@@ -10,15 +10,11 @@ import {
 } from '@/ui/component/Modal/WrapPromise';
 import { Popup } from '@/ui/component';
 import clsx from 'clsx';
+import LessPalette from '@/ui/style/var-defs';
 import { copyTextToClipboard } from '@/ui/utils/clipboard';
 
-import IconCopy, {
-  ReactComponent as RcIconCopy,
-} from 'ui/assets/send-token/modal/copy.svg';
-import IconSuccess, {
-  ReactComponent as RcIconSuccess,
-} from 'ui/assets/success.svg';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
+import IconCopy from 'ui/assets/send-token/modal/copy.svg';
+import IconSuccess from 'ui/assets/success.svg';
 
 const StyledPopup = styled(Popup)`
   .ant-drawer-body {
@@ -42,7 +38,7 @@ const FormInputItem = styled(Form.Item)`
     font-style: normal;
     font-weight: 400;
     line-height: normal;
-    color: var(--r-neutral-foot, #babec5);
+    color: ${LessPalette['@color-comment']};
     height: initial;
 
     &::before {
@@ -134,7 +130,6 @@ function ModalConfirmAddToContacts({
       title={title}
       onCancel={handleCancel}
       height={266}
-      isSupportDarkMode
     >
       <Form onFinish={handleSubmit} form={form}>
         <FormInputItem
@@ -166,12 +161,12 @@ function ModalConfirmAddToContacts({
         </FormInputItem>
         <div
           className={clsx(
-            'text-r-neutral-title-1',
+            `text-${LessPalette['@color-title']}`,
             'font-medium text-[14px] flex justify-start items-center'
           )}
         >
           {addrToAdd}
-          <ThemeIcon
+          <img
             onClick={() => {
               copyTextToClipboard(addrToAdd).then(() => {
                 message.success({
@@ -189,7 +184,7 @@ function ModalConfirmAddToContacts({
                 });
               });
             }}
-            src={RcIconCopy}
+            src={IconCopy}
             className="ml-[4px] w-[14px] h-[14px] cursor-pointer"
           />
         </div>

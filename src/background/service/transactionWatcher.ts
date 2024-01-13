@@ -108,18 +108,12 @@ class TransactionWatcher {
         ? i18n.t('background.transactionWatcher.completed')
         : i18n.t('background.transactionWatcher.failed');
 
-    const content =
-      txReceipt.status === '0x1'
-        ? i18n.t('background.transactionWatcher.txCompleteMoreContent', {
-            chain: chainItem.name,
-            nonce: Number(nonce),
-          })
-        : i18n.t('background.transactionWatcher.txFailedMoreContent', {
-            chain: chainItem.name,
-            nonce: Number(nonce),
-          });
-
-    notification.create(url, title, content, 2);
+    notification.create(
+      url,
+      title,
+      i18n.t('background.transactionWatcher.more'),
+      2
+    );
 
     eventBus.emit(EVENTS.broadcastToUI, {
       method: EVENTS.TX_COMPLETED,

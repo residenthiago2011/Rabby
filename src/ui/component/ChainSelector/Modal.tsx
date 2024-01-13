@@ -38,7 +38,6 @@ interface ChainSelectorModalProps {
   hideTestnetTab?: boolean;
   showRPCStatus?: boolean;
   height?: number;
-  zIndex?: number;
 }
 
 const useChainSeletorList = ({
@@ -120,7 +119,6 @@ const ChainSelectorModal = ({
   hideTestnetTab = false,
   showRPCStatus = false,
   height = 494,
-  zIndex,
 }: ChainSelectorModalProps) => {
   const handleCancel = () => {
     onCancel();
@@ -180,12 +178,10 @@ const ChainSelectorModal = ({
       visible={visible}
       onClose={handleCancel}
       className={clsx(
-        'custom-popup is-support-darkmode',
         'chain-selector__modal',
         connection && 'connection',
         className
       )}
-      zIndex={zIndex}
       destroyOnClose
     >
       <header className={title ? 'pt-[8px]' : 'pt-[20px]'}>

@@ -15,7 +15,6 @@ import styled from 'styled-components';
 import SecurityLevelTagNoText from '../SecurityEngine/SecurityLevelTagNoText';
 import { AccountInfo } from './AccountInfo';
 import { ActionGroup, Props as ActionGroupProps } from './ActionGroup';
-import { useThemeMode } from '@/ui/hooks/usePreference';
 
 interface Props extends Omit<ActionGroupProps, 'account'> {
   chain?: Chain;
@@ -33,22 +32,15 @@ interface Props extends Omit<ActionGroupProps, 'account'> {
 const Wrapper = styled.section`
   padding: 20px;
   padding-top: 12px;
+  box-shadow: 0px -8px 24px rgba(0, 0, 0, 0.1);
   border-radius: 16px 16px 0px 0px;
-  background: var(--r-neutral-bg-1, #3d4251);
-  box-shadow: 0px -8px 24px 0px rgba(0, 0, 0, 0.1);
-
-  &.is-darkmode {
-    box-shadow: 0px -8px 12px 0px rgba(0, 0, 0, 0.2);
-  }
-
   position: relative;
-
   .request-origin {
     height: 30px;
     font-weight: 500;
     font-size: 13px;
     line-height: 15px;
-    color: #707280;
+    color: #666;
     padding-bottom: 12px;
     position: relative;
     margin-bottom: 12px;
@@ -56,7 +48,7 @@ const Wrapper = styled.section`
     align-items: center;
     position: relative;
     .origin {
-      color: var(--r-neutral-title-1, #f7fafc);
+      color: #333;
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -80,8 +72,7 @@ const Wrapper = styled.section`
       width: 100vw;
       margin-left: -20px;
       height: 1px;
-      height: 0.5px;
-      background-color: var(--r-neutral-line, rgba(255, 255, 255, 0.1));
+      background-color: rgba(0, 0, 0, 0.05);
     }
   }
   .security-level-tip {
@@ -124,7 +115,6 @@ const Shadow = styled.div`
     rgba(175, 175, 175, 0.168147) 41.66%,
     rgba(130, 130, 130, 0.35) 83.44%
   );
-  z-index: 10;
 `;
 
 const ChainLogo = styled.img`
@@ -138,18 +128,18 @@ const ChainLogo = styled.img`
 
 const SecurityLevelTipColor = {
   [Level.FORBIDDEN]: {
-    bg: 'var(--r-red-light-2, #EFD4D1)',
-    text: 'var(--r-red-dark, #AE2A19)',
+    bg: 'rgba(175, 22, 14, 0.1)',
+    text: '#AF160E',
     icon: SecurityEngineLevel[Level.FORBIDDEN].icon,
   },
   [Level.DANGER]: {
-    bg: 'var(--r-red-light, #FFDFDB)',
-    text: 'var(--r-red-default, #E34935)',
+    bg: 'rgba(236, 81, 81, 0.1)',
+    text: '#EC5151',
     icon: SecurityEngineLevel[Level.DANGER].icon,
   },
   [Level.WARNING]: {
-    bg: 'var(--r-orange-light, #FFEDCB)',
-    text: 'var(--r-orange-default, #FFB020)',
+    bg: 'rgba(255, 176, 32, 0.1)',
+    text: '#FFB020',
     icon: SecurityEngineLevel[Level.WARNING].icon,
   },
 };
@@ -234,18 +224,16 @@ export const FooterBar: React.FC<Props> = ({
     init();
   }, []);
 
-  const { isDarkTheme } = useThemeMode();
-
   if (!account) {
     return null;
   }
 
   return (
     <div className="relative">
-      {!isDarkTheme && hasShadow && <Shadow />}
+      {hasShadow && <Shadow />}
       <Wrapper
-        className={clsx({
-          'is-darkmode': hasShadow,
+        className={clsx('bg-white', {
+          'has-shadow': hasShadow,
         })}
       >
         {origin && (

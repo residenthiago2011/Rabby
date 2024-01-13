@@ -2,8 +2,6 @@ import React, { ReactNode, SyntheticEvent, useEffect, useState } from 'react';
 import cx from 'clsx';
 import IconCheck from 'ui/assets/check.svg';
 import './style.less';
-import clsx from 'clsx';
-import ThemeIcon from '../ThemeMode/ThemeIcon';
 
 interface CheckboxProps {
   checked: boolean;
@@ -14,10 +12,8 @@ interface CheckboxProps {
   width?: string;
   height?: string;
   className?: string;
-  checkBoxClassName?: string;
   children?: ReactNode;
   checkIcon?: ReactNode;
-  type?: 'circle' | 'square';
 }
 
 const Checkbox = ({
@@ -25,11 +21,10 @@ const Checkbox = ({
   onChange,
   defaultChecked = false,
   background = 'var(--r-blue-default, #7084ff)',
-  unCheckBackground = 'var(--r-neutral-line, rgba(255, 255, 255, 0.1))',
-  type = 'circle',
+  unCheckBackground = '#E5E9EF',
+
   width = '16px',
   height = '16px',
-  checkBoxClassName,
   className,
   children,
   checkIcon,
@@ -53,14 +48,14 @@ const Checkbox = ({
       onClick={(e) => handleValueChange(e, !checkState)}
     >
       <div
-        className={clsx('rabby-checkbox', type, checkBoxClassName)}
+        className="rabby-checkbox"
         style={{
           width,
           height,
           backgroundColor: checkState ? background : unCheckBackground,
         }}
       >
-        {checkIcon ?? <ThemeIcon src={IconCheck} className="icon icon-check" />}
+        {checkIcon ?? <img src={IconCheck} className="icon icon-check" />}
       </div>
       {children && <div className="rabby-checkbox__label">{children}</div>}
     </div>

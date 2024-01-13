@@ -1,6 +1,6 @@
 import { message, Table } from 'antd';
 import React, { useEffect } from 'react';
-import { ReactComponent as RcCopySVG } from 'ui/assets/icon-copy-cc.svg';
+import { ReactComponent as CopySVG } from 'ui/assets/icon-copy-gray.svg';
 import ClipboardJS from 'clipboard';
 import { AddToRabby } from './AddToRabby';
 import { MAX_ACCOUNT_COUNT } from './AdvancedSettings';
@@ -8,7 +8,7 @@ import { AccountListSkeleton } from './AccountListSkeleton';
 import { UsedChain } from '@rabby-wallet/rabby-api/dist/types';
 import { isSameAddress, splitNumberByStep, useWallet } from '@/ui/utils';
 import dayjs from 'dayjs';
-import { ReactComponent as RcArrowSVG } from 'ui/assets/ledger/arrow.svg';
+import { ReactComponent as ArrowSVG } from 'ui/assets/ledger/arrow.svg';
 import clsx from 'clsx';
 import { fetchAccountsInfo, HDManagerStateContext } from './utils';
 import { AliasName } from './AliasName';
@@ -16,9 +16,6 @@ import { ChainList } from './ChainList';
 import { KEYRING_CLASS } from '@/constant';
 import { useRabbyDispatch } from '@/ui/store';
 import { useTranslation } from 'react-i18next';
-import { detectClientOS } from '@/ui/utils/os';
-
-const isWin32 = detectClientOS() === 'win32';
 
 export interface Account {
   address: string;
@@ -90,7 +87,7 @@ export const AccountList: React.FC<Props> = ({
 
   React.useEffect(() => {
     if (!hiddenInfo) {
-      fetchAccountsInfo(wallet, data ?? []).then(setList);
+      createTask(() => fetchAccountsInfo(wallet, data ?? []).then(setList));
     } else {
       setList(data ?? []);
     }
@@ -149,7 +146,7 @@ export const AccountList: React.FC<Props> = ({
 
       return;
     },
-    [keyring, keyringId, wallet]
+    []
   );
 
   const handleChangeAliasName = React.useCallback(
@@ -202,7 +199,7 @@ export const AccountList: React.FC<Props> = ({
       scroll={{ y: 'calc(100vh - 352px)' }}
       dataSource={list}
       rowKey={(record) => record.address || record.index}
-      className={clsx('AccountList', isWin32 && 'is-win32')}
+      className="AccountList"
       loading={
         !preventLoading && loading
           ? {
@@ -222,11 +219,11 @@ export const AccountList: React.FC<Props> = ({
             })}
             style={{
               top: `${infoColumnTop}px`,
-              width: `${infoColumnWidth + (isWin32 ? 6 : 1)}px`,
+              width: `${infoColumnWidth + 1}px`,
             }}
           >
             <td>
-              <RcArrowSVG className="icon text-r-neutral-title-1" />
+              <ArrowSVG className="icon" />
               <span>{t('page.newAddress.hd.clickToGetInfo')}</span>
             </td>
           </tr>
@@ -274,9 +271,9 @@ export const AccountList: React.FC<Props> = ({
           key="address"
           render={(value: string, record, index) =>
             value ? (
-              <div className="cell-address text-r-neutral-title-1">
+              <div className="cell-address">
                 <span>{value.toLowerCase()}</span>
-                <RcCopySVG
+                <CopySVG
                   onClick={() => copy(value.toLowerCase())}
                   className="copy-icon"
                 />
@@ -365,7 +362,7 @@ export const AccountList: React.FC<Props> = ({
           render={(balance, record) =>
             hiddenInfo ? (
               <AccountListSkeleton width={100} />
-            ) : record.chains?.length && balance ? (
+            ) : record.chains?.length ? (
               `$${splitNumberByStep(balance.toFixed(2))}`
             ) : null
           }

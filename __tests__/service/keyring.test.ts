@@ -219,7 +219,7 @@ describe('keyringService', () => {
     it('throws an error if no encrypted vault is in controller state', async () => {
       await expect(() =>
         keyringService.verifyPassword('password')
-      ).rejects.toThrow('background.error.canNotUnlock');
+      ).rejects.toThrow('Cannot unlock without a previous vault');
     });
   });
 
@@ -268,8 +268,7 @@ describe('keyringService', () => {
   });
 
   describe('exportAppKeyForAddress', () => {
-    // reported error "Expected Uint8Array", no idea how to fix it
-    it.skip('returns a unique key', async () => {
+    it('returns a unique key', async () => {
       const address = '0x01560cd3bac62cc6d7e6380600d9317363400896';
       const privateKey =
         '0xb8a9c05beeedb25df85f8d641538cbffedf67216048de9c678ee26260eb91952';

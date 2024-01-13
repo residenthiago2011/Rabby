@@ -1,10 +1,10 @@
 import { groupBy } from 'lodash';
 import 'reflect-metadata';
 import * as Sentry from '@sentry/browser';
-import browser from 'webextension-polyfill';
+import { browser } from 'webextension-polyfill-ts';
 import { ethErrors } from 'eth-rpc-errors';
 import { WalletController } from 'background/controller/wallet';
-import { Message } from '@/utils/message';
+import { Message } from '@/utils';
 import { CHAINS, EVENTS, KEYRING_CATEGORY_MAP } from 'consts';
 import { storage } from './webapi';
 import {
@@ -22,7 +22,6 @@ import {
   swapService,
   RPCService,
   securityEngineService,
-  transactionBroadcastWatchService,
 } from './service';
 import { providerController, walletController } from './controller';
 import i18n from './service/i18n';
@@ -89,7 +88,6 @@ async function restoreAppState() {
   await permissionService.init();
   await preferenceService.init();
   await transactionWatchService.init();
-  await transactionBroadcastWatchService.init();
   await pageStateCacheService.init();
   await transactionHistoryService.init();
   await contactBookService.init();
@@ -104,7 +102,6 @@ async function restoreAppState() {
   appStoreLoaded = true;
 
   transactionWatchService.roll();
-  transactionBroadcastWatchService.roll();
   initAppMeta();
   startEnableUser();
 }

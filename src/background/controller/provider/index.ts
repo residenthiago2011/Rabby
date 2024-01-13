@@ -11,10 +11,8 @@ import {
 import rpcFlow from './rpcFlow';
 import internalMethod from './internalMethod';
 
-const IGNORE_CHECK = ['wallet_importAddress'];
-
 tab.on('tabRemove', (id) => {
-  sessionService.deleteSessionsByTabId(id);
+  sessionService.deleteSession(id);
 });
 
 export default async <T = void>(req: ProviderRequest): Promise<T> => {
@@ -26,13 +24,11 @@ export default async <T = void>(req: ProviderRequest): Promise<T> => {
     return internalMethod[method](req);
   }
 
-  if (!IGNORE_CHECK.includes(method)) {
-    const hasVault = keyringService.hasVault();
-    if (!hasVault) {
-      throw ethErrors.provider.userRejectedRequest({
-        message: 'wallet must has at least one account',
-      });
-    }
+  const hasVault = keyringService.hasVault();
+  if (!hasVault) {
+    throw ethErrors.provider.userRejectedRequest({
+      message: 'wallet must has at least one account',
+    });
   }
 
   return rpcFlow(req) as any;

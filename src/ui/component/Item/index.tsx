@@ -7,20 +7,16 @@ import React, {
 import { ReactNode } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled, { css } from 'styled-components';
-import IconArrowRight, {
-  ReactComponent as RcIconArrowRight,
-} from 'ui/assets/address/right-arrow.svg';
+import IconArrowRight from 'ui/assets/address/right-arrow.svg';
 import ArrowLeftWhiteBack from 'ui/assets/import/arrow-left-white.svg';
-import ThemeIcon from '../ThemeMode/ThemeIcon';
-import { ThemeIconType } from '@/constant';
 
 const ItemWrapper = styled.div<{
   hoverBorder: boolean;
   px: number | string;
   py: number | string;
-  // default var(--r-neutral-card-1, #fff);
+  //default white;
   bgColor: string;
-  // default var(--r-blue-light-1, #eef1ff);
+  //default var(--r-blue-light-1, #eef1ff);
   hoverBgColor: string;
 }>`
   width: 100%;
@@ -47,7 +43,12 @@ const ItemWrapper = styled.div<{
       : ''}
 `;
 
-const RightIconSvg = styled(RcIconArrowRight)`
+export const IconImg = styled.img`
+  width: 24px;
+  height: 24px;
+`;
+
+const RightIconImg = styled(IconImg)`
   margin-left: auto;
   width: 16px;
   height: 16px;
@@ -63,7 +64,7 @@ interface ItemProps extends ComponentPropsWithoutRef<'div'> {
   hoverBgColor?: string;
   className?: string;
 
-  leftIcon?: ThemeIconType;
+  leftIcon?: string;
   rightIcon?: string | null;
   leftIconClassName?: string;
   rightIconClassName?: string;
@@ -80,8 +81,8 @@ export const Item = (props: PropsWithChildren<ItemProps>) => {
     hoverBorder = true,
     px = 16,
     py = 16,
-    bgColor = 'var(--r-neutral-card-1, #fff)',
-    hoverBgColor = 'var(--r-blue-light-2, rgba(222, 227, 252, 1))',
+    bgColor = '#fff',
+    hoverBgColor = 'var(--r-blue-light-1, #eef1ff)',
     className = '',
     leftIconClassName = '',
     rightIconClassName = '',
@@ -102,17 +103,13 @@ export const Item = (props: PropsWithChildren<ItemProps>) => {
       {left ? (
         left
       ) : leftIcon ? (
-        <ThemeIcon
-          src={leftIcon}
-          className={clsx(leftIconClassName, 'w-24 h-24')}
-        />
+        <IconImg src={leftIcon} className={leftIconClassName} alt="" />
       ) : null}
       {children}
       {right ? (
         right
       ) : rightIcon ? (
-        // <RightIconImg src={rightIcon} className={rightIconClassName} alt="" />
-        <ThemeIcon src={RightIconSvg} className={rightIconClassName} />
+        <RightIconImg src={rightIcon} className={rightIconClassName} alt="" />
       ) : null}
     </ItemWrapper>
   );
@@ -121,7 +118,7 @@ export const Item = (props: PropsWithChildren<ItemProps>) => {
 const BlueHeaderWrapper = styled.div<{ fixed?: boolean }>`
   position: relative;
   height: 56px;
-  background: var(--r-blue-default, #7084ff);
+  background: var(--r-brand-default, #7084ff);
   display: flex;
   justify-content: center;
   align-items: center;

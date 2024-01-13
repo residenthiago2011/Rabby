@@ -266,65 +266,35 @@ export const useAddressSource = ({
   type,
   brandName,
   byImport = false,
-  address,
 }: {
   type: string;
   brandName: string;
   byImport?: boolean;
-  address?: string;
 }) => {
   const { t } = useTranslation();
-  const [source, setSource] = useState<string>('');
-  const wallet = useWallet();
-
-  useEffect(() => {
-    if (byImport === true && KEYRING_TYPE.HdKeyring === type) {
-      if (address) {
-        wallet
-          .getMnemonicKeyringIfNeedPassphrase('address', address)
-          .then((needPassphrase) => {
-            if (needPassphrase) {
-              setSource(t('constant.IMPORTED_HD_KEYRING_NEED_PASSPHRASE'));
-            } else {
-              setSource(t('constant.IMPORTED_HD_KEYRING'));
-            }
-          });
-      } else {
-        setSource(t('constant.IMPORTED_HD_KEYRING'));
-      }
-      return;
-    }
-    const dict = {
-      [KEYRING_TYPE.HdKeyring]: t('constant.KEYRING_TYPE_TEXT.HdKeyring'),
-      [KEYRING_TYPE.SimpleKeyring]: t(
-        'constant.KEYRING_TYPE_TEXT.SimpleKeyring'
-      ),
-      [KEYRING_TYPE.WatchAddressKeyring]: t(
-        'constant.KEYRING_TYPE_TEXT.WatchAddressKeyring'
-      ),
-    };
-    if (dict[type]) {
-      setSource(dict[type]);
-      return;
-    }
-    if (KEYRING_TYPE_TEXT[type]) {
-      setSource(KEYRING_TYPE_TEXT[type]);
-      return;
-    }
-    if (WALLET_BRAND_CONTENT[brandName]) {
-      setSource(WALLET_BRAND_CONTENT[brandName].name);
-      return;
-    }
-  }, [type, brandName, byImport, address]);
-
-  return source;
+  if (byImport === true && KEYRING_TYPE.HdKeyring === type) {
+    return t('constant.IMPORTED_HD_KEYRING');
+  }
+  const dict = {
+    [KEYRING_TYPE.HdKeyring]: t('constant.KEYRING_TYPE_TEXT.HdKeyring'),
+    [KEYRING_TYPE.SimpleKeyring]: t('constant.KEYRING_TYPE_TEXT.SimpleKeyring'),
+    [KEYRING_TYPE.WatchAddressKeyring]: t(
+      'constant.KEYRING_TYPE_TEXT.WatchAddressKeyring'
+    ),
+  };
+  if (dict[type]) {
+    return dict[type];
+  }
+  if (KEYRING_TYPE_TEXT[type]) {
+    return KEYRING_TYPE_TEXT[type];
+  }
+  if (WALLET_BRAND_CONTENT[brandName]) {
+    return WALLET_BRAND_CONTENT[brandName].name;
+  }
+  return '';
 };
 
-export const useAccountInfo = (
-  type: string,
-  address: string,
-  brand?: string
-) => {
+export const useAccountInfo = (type: string, address: string) => {
   const wallet = useWallet();
   const [account, setAccount] = useState<{
     address: string;
@@ -339,7 +309,6 @@ export const useAccountInfo = (
     type === KEYRING_CLASS.HARDWARE.TREZOR ||
     type === KEYRING_CLASS.HARDWARE.ONEKEY;
   const isMnemonics = type === KEYRING_CLASS.MNEMONIC;
-  const isKeystone = brand === 'Keystone';
   const mnemonicAccounts = useRabbySelector((state) => state.account);
   const fetAccountInfo = useCallback(() => {
     wallet.requestKeyring(type, 'getAccountInfo', null, address).then((res) => {
@@ -364,19 +333,17 @@ export const useAccountInfo = (
   }, []);
 
   const fetchMnemonicsAccount = useCallback(async () => {
-    const info = await wallet.getMnemonicAddressInfo(address);
-    if (info) {
-      setAccount({
-        address,
-        index: info.index + 1,
-        hdPathType: info.hdPathType,
-        hdPathTypeLabel: LedgerHDPathTypeLabel[info.hdPathType],
-      });
-    }
+    const index = (await wallet.getMnemonicAddressIndex(address)) ?? 0;
+    setAccount({
+      address,
+      index: index + 1,
+      hdPathType: LedgerHDPathType.Default,
+      hdPathTypeLabel: LedgerHDPathTypeLabel.Default,
+    });
   }, []);
 
   useEffect(() => {
-    if (isLedger || isGridPlus || isKeystone) {
+    if (isLedger || isGridPlus) {
       fetAccountInfo();
     } else if (isTrezorLike) {
       fetchTrezorLikeAccount();

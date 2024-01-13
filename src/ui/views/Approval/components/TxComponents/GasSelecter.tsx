@@ -4,30 +4,23 @@ import { ValidateStatus } from 'antd/lib/form/FormItem';
 import { GasLevel } from 'background/service/openapi';
 import BigNumber from 'bignumber.js';
 import clsx from 'clsx';
-import {
-  CHAINS,
-  MINIMUM_GAS_LIMIT,
-  L2_ENUMS,
-  CAN_ESTIMATE_L1_FEE_CHAINS,
-} from 'consts';
+import { CHAINS, GAS_LEVEL_TEXT, MINIMUM_GAS_LIMIT } from 'consts';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 import IconInfo from 'ui/assets/infoicon.svg';
 import { Popup } from 'ui/component';
-import { TooltipWithMagnetArrow } from 'ui/component/Tooltip/TooltipWithMagnetArrow';
 import { formatTokenAmount } from 'ui/utils/number';
 import { calcMaxPriorityFee } from '@/utils/transaction';
 import styled, { css } from 'styled-components';
 import { Result } from '@rabby-wallet/rabby-security-engine';
 import { useRabbyDispatch, useRabbySelector } from '@/ui/store';
 import SecurityLevelTagNoText from '../SecurityEngine/SecurityLevelTagNoText';
+import LessPalette from '@/ui/style/var-defs';
 import { ReactComponent as IconArrowRight } from 'ui/assets/approval/edit-arrow-right.svg';
-import { ReactComponent as RcIconAlert } from 'ui/assets/sign/tx/alert-currentcolor.svg';
-import IconQuestionMark from 'ui/assets/sign/tx/question-mark.svg';
+import IconAlert from 'ui/assets/sign/tx/alert.svg';
 import { Chain } from '@debank/common';
 import { getGasLevelI18nKey } from '@/ui/utils/trans';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 export interface GasSelectorResponse extends GasLevel {
   gasLimit: number;
@@ -59,8 +52,6 @@ interface GasSelectorProps {
   selectedGas: GasLevel | null;
   is1559: boolean;
   isHardware: boolean;
-  isCancel: boolean;
-  isSpeedUp: boolean;
   gasCalcMethod: (
     price: number
   ) => Promise<{
@@ -140,7 +131,7 @@ const CardBody = styled.div<{
   .card {
     width: 76px;
     height: 52px;
-    background: var(--r-neutral-card-3, #f7fafc);
+    background: #f5f6fa;
     border-radius: 4px;
     display: flex;
     flex-direction: column;
@@ -151,17 +142,14 @@ const CardBody = styled.div<{
       text-align: center;
       font-size: 12px;
       line-height: 14px;
-      color: var(--r-neutral-body, #3e495e);
+      color: ${LessPalette['@color-comment']};
       margin: 8px auto 0;
     }
     .cardTitle {
-      color: var(--r-neutral-title-1, #192945) !important;
+      color: ${LessPalette['@color-title']} !important;
       font-weight: 500;
       font-size: 13px !important;
       margin: 4px auto 0;
-      .ant-input {
-        background: transparent;
-      }
     }
     .custom-input {
       margin: 4px auto 0;
@@ -170,16 +158,15 @@ const CardBody = styled.div<{
       text-align: center !important;
       font-size: 13px !important;
       font-weight: 500;
-      color: var(--r-neutral-title-1, #192945);
+      color: ${LessPalette['@color-title']};
       padding-top: 0;
-      transition: none;
       &.active {
         color: var(--r-blue-default, #7084ff) !important;
       }
     }
     .ant-input:focus,
     .ant-input-focused {
-      color: var(--r-neutral-title-1);
+      color: #000000;
     }
   }
 `;
@@ -189,11 +176,11 @@ const ManuallySetGasLimitAlert = styled.div`
   font-size: 13px;
   line-height: 15px;
   margin-top: 10px;
-  color: var(--r-neutral-body);
+  color: #707280;
 `;
 
 const ErrorsWrapper = styled.div`
-  border-top: 1px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1));
+  border-top: 1px solid #ededed;
   padding-top: 14px;
   margin-top: 14px;
   .item {
@@ -201,7 +188,7 @@ const ErrorsWrapper = styled.div`
     font-weight: 500;
     font-size: 14px;
     line-height: 16px;
-    color: var(--r-neutral-body, #3e495e);
+    color: #333333;
     margin-bottom: 10px;
     align-items: flex-start;
     .icon-alert {
@@ -236,8 +223,6 @@ const GasSelector = ({
   engineResults = [],
   nativeTokenBalance,
   gasPriceMedian,
-  isCancel,
-  isSpeedUp,
 }: GasSelectorProps) => {
   const dispatch = useRabbyDispatch();
   const { t } = useTranslation();
@@ -251,11 +236,7 @@ const GasSelector = ({
     rawSelectedGas
   );
   const [maxPriorityFee, setMaxPriorityFee] = useState<number>(
-    selectedGas
-      ? (selectedGas.priority_price === null
-          ? selectedGas.price
-          : selectedGas.priority_price) / 1e9
-      : 0
+    selectedGas ? selectedGas.price / 1e9 : 0
   );
   const [isReal1559, setIsReal1559] = useState(false);
   const [customNonce, setCustomNonce] = useState(Number(nonce));
@@ -277,6 +258,11 @@ const GasSelector = ({
     },
   });
   const chain = Object.values(CHAINS).find((item) => item.id === chainId)!;
+  const sliderStep = useMemo(() => {
+    if (!selectedGas) return 0;
+    if (selectedGas.price / 1e9 <= 50) return 0.1;
+    return 1;
+  }, [selectedGas]);
 
   const { rules, processedRules } = useRabbySelector((s) => ({
     rules: s.securityEngine.rules,
@@ -442,12 +428,7 @@ const GasSelector = ({
         price: Number(target.price),
         gasLimit: Number(afterGasLimit),
         nonce: Number(customNonce),
-        maxPriorityFee: calcMaxPriorityFee(
-          gasList,
-          target,
-          chainId,
-          isCancel || isSpeedUp
-        ),
+        maxPriorityFee: calcMaxPriorityFee(gasList, target, chainId),
       });
     } else {
       onChange({
@@ -455,12 +436,7 @@ const GasSelector = ({
         gasLimit: Number(afterGasLimit),
         nonce: Number(customNonce),
         level: gas?.level,
-        maxPriorityFee: calcMaxPriorityFee(
-          gasList,
-          target,
-          chainId,
-          isCancel || isSpeedUp
-        ),
+        maxPriorityFee: calcMaxPriorityFee(gasList, target, chainId),
       });
     }
   };
@@ -482,7 +458,6 @@ const GasSelector = ({
         front_tx_count: 0,
         estimated_seconds: 0,
         base_fee: gasList[0].base_fee,
-        priority_price: 0,
       };
 
       const currentObj = {
@@ -508,7 +483,6 @@ const GasSelector = ({
       front_tx_count: 0,
       estimated_seconds: 0,
       base_fee: gasList[0].base_fee,
-      priority_price: null,
     };
     setSelectedGas({
       ...gas,
@@ -542,7 +516,6 @@ const GasSelector = ({
           price: Number(customGas) * 1e9,
           front_tx_count: 0,
           estimated_seconds: 0,
-          priority_price: null,
           base_fee: gasList[0].base_fee,
         }));
     },
@@ -600,17 +573,8 @@ const GasSelector = ({
 
   useEffect(() => {
     if (isReady && selectedGas && chainId === 1) {
-      if (selectedGas.priority_price && selectedGas.priority_price !== null) {
-        setMaxPriorityFee(selectedGas.priority_price / 1e9);
-      } else {
-        const priorityFee = calcMaxPriorityFee(
-          gasList,
-          selectedGas,
-          chainId,
-          isSpeedUp || isCancel
-        );
-        setMaxPriorityFee(priorityFee / 1e9);
-      }
+      const priorityFee = calcMaxPriorityFee(gasList, selectedGas, chainId);
+      setMaxPriorityFee(priorityFee / 1e9);
     } else if (selectedGas) {
       setMaxPriorityFee(selectedGas.price / 1e9);
     }
@@ -666,29 +630,14 @@ const GasSelector = ({
                 </>
               ) : (
                 <div className="gas-selector-card-content-item">
-                  <div className="gas-selector-card-amount translate-y-1 flex items-center">
-                    <span className="text-r-blue-default font-medium text-15">
+                  <div className="gas-selector-card-amount translate-y-1">
+                    <span className="text-blue-light font-medium text-15">
                       {formatTokenAmount(
-                        new BigNumber(gas.gasCostAmount).toString(10),
-                        6
+                        new BigNumber(gas.gasCostAmount).toString(10)
                       )}{' '}
                       {chain.nativeTokenSymbol}
                     </span>
                     &nbsp; ≈${new BigNumber(gas.gasCostUsd).toFixed(2)}
-                    {L2_ENUMS.includes(chain.enum) &&
-                      !CAN_ESTIMATE_L1_FEE_CHAINS.includes(chain.enum) && (
-                        <span className="relative ml-6">
-                          <TooltipWithMagnetArrow
-                            title={t('page.signTx.l2GasEstimateTooltip')}
-                            className="rectangle w-[max-content]"
-                          >
-                            <img
-                              src={IconQuestionMark}
-                              className="cursor-pointer w-14"
-                            />
-                          </TooltipWithMagnetArrow>
-                        </span>
-                      )}
                   </div>
                 </div>
               )}
@@ -709,7 +658,7 @@ const GasSelector = ({
           </div>
           <div className="flex-1" />
           <div
-            className="flex items-center text-12 text-r-neutral-foot cursor-pointer"
+            className="flex items-center text-12 text-gray-content cursor-pointer"
             role="button"
             onClick={handleClickEdit}
           >
@@ -737,13 +686,8 @@ const GasSelector = ({
           <ErrorsWrapper>
             {errors.map((error) => (
               <div className="item" key={error.code}>
-                <ThemeIcon
-                  src={RcIconAlert}
-                  className="icon icon-alert text-r-neutral-body"
-                />
-                <span className="flex-1">
-                  {error.msg} #{error.code}
-                </span>
+                <img src={IconAlert} className="icon icon-alert" />
+                {error.msg} #{error.code}
               </div>
             ))}
           </ErrorsWrapper>
@@ -757,7 +701,6 @@ const GasSelector = ({
         onCancel={() => setModalVisible(false)}
         destroyOnClose
         closable
-        isSupportDarkMode
       >
         <div className="gas-selector-modal-top">
           {disabled ? (
@@ -780,8 +723,7 @@ const GasSelector = ({
             <>
               <div className="gas-selector-modal-amount">
                 {formatTokenAmount(
-                  new BigNumber(modalExplainGas.gasCostAmount).toString(10),
-                  6
+                  new BigNumber(modalExplainGas.gasCostAmount).toString(10)
                 )}{' '}
                 {chain.nativeTokenSymbol}
               </div>
@@ -868,7 +810,7 @@ const GasSelector = ({
                   max={selectedGas ? selectedGas.price / 1e9 : 0}
                   onChange={handleMaxPriorityFeeChange}
                   value={maxPriorityFee}
-                  step={0.01}
+                  step={sliderStep}
                 />
                 <p className="priority-slider__mark">
                   <span>0</span>
@@ -891,7 +833,7 @@ const GasSelector = ({
               >
                 <span className="flex-1">{t('page.signTx.gasLimitTitle')}</span>
               </p>
-              <div className="expanded gas-limit-panel-wrapper widget-has-ant-input">
+              <div className="expanded gas-limit-panel-wrapper">
                 <Tooltip
                   overlayClassName="rectangle"
                   title={
@@ -988,7 +930,7 @@ const GasPriceDesc = styled.ul`
   margin-top: 12px;
   margin-bottom: 0;
   font-size: 13px;
-  color: var(--r-neutral-body, #3e495e);
+  color: #4b4d59;
   li {
     position: relative;
     margin-bottom: 8px;
@@ -1002,7 +944,7 @@ const GasPriceDesc = styled.ul`
       width: 4px;
       height: 4px;
       border-radius: 100%;
-      background-color: var(--r-neutral-body, #3e495e);
+      background-color: #4b4d59;
       left: 0;
       top: 8px;
     }

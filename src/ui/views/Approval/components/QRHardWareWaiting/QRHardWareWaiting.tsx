@@ -5,7 +5,6 @@ import Reader from './Reader';
 import {
   CHAINS,
   EVENTS,
-  HARDWARE_KEYRING_TYPES,
   KEYRING_CATEGORY_MAP,
   WALLET_BRAND_CONTENT,
   WALLET_BRAND_TYPES,
@@ -18,15 +17,7 @@ import { RequestSignPayload } from '@/background/service/keyring/eth-keystone-ke
 import { ApprovalPopupContainer } from '../Popup/ApprovalPopupContainer';
 import { adjustV } from '@/ui/utils/gnosis';
 import { findChainByEnum } from '@/utils/chain';
-import {
-  UnderlineButton as SwitchButton,
-  SIGNATURE_METHOD,
-  useCanSwitchSignature,
-  KeystoneWiredWaiting,
-} from './KeystoneWaiting';
-import clsx from 'clsx';
 
-const KEYSTONE_TYPE = HARDWARE_KEYRING_TYPES.Keystone.type;
 enum QRHARDWARE_STATUS {
   SYNC,
   SIGN,
@@ -39,11 +30,6 @@ const QRHardWareWaiting = ({ params }) => {
   const [status, setStatus] = useState<QRHARDWARE_STATUS>(
     QRHARDWARE_STATUS.SYNC
   );
-  const [brand, setBrand] = useState<string>('');
-  const [signMethod, setSignMethod] = useState<SIGNATURE_METHOD>(
-    SIGNATURE_METHOD.QRCODE
-  );
-  const canSwitchSignature = useCanSwitchSignature(brand);
   const [signPayload, setSignPayload] = useState<RequestSignPayload>();
   const [getApproval, resolveApproval, rejectApproval] = useApproval();
   const [errorMessage, setErrorMessage] = useState('');
@@ -69,11 +55,9 @@ const QRHardWareWaiting = ({ params }) => {
     const approval = await getApproval();
     const account = await wallet.syncGetCurrentAccount()!;
     if (!account) return;
-    setBrand(account.brandName);
-    const icon = WALLET_BRAND_CONTENT[account.brandName].icon;
     setTitle(
       <div className="flex justify-center items-center">
-        <img src={icon} className="w-20 mr-8" />
+        <img src={walletBrandContent.icon} className="w-20 mr-8" />
         <span>
           {t('page.signFooterBar.qrcode.signWith', {
             brand: account.brandName,
@@ -85,27 +69,10 @@ const QRHardWareWaiting = ({ params }) => {
     setIsSignText(
       params.isGnosis ? true : approval?.data.approvalType !== 'SignTx'
     );
-
-    let currentSignId = null;
-    if (account.brandName === WALLET_BRAND_TYPES.KEYSTONE) {
-      currentSignId = await wallet.requestKeyring(
-        KEYSTONE_TYPE,
-        'exportCurrentSignRequestIdIfExist',
-        null
-      );
-    }
-
     eventBus.addEventListener(
       EVENTS.QRHARDWARE.ACQUIRE_MEMSTORE_SUCCEED,
       ({ request }) => {
-        if (currentSignId) {
-          if (currentSignId === request.requestId) {
-            setSignPayload(request);
-          }
-          return;
-        } else {
-          setSignPayload(request);
-        }
+        setSignPayload(request);
       }
     );
     eventBus.addEventListener(EVENTS.SIGN_FINISHED, async (data) => {
@@ -199,7 +166,6 @@ const QRHardWareWaiting = ({ params }) => {
             createBy: params?.$ctx?.ga ? 'rabby' : 'dapp',
             source: params?.$ctx?.ga?.source || '',
             trigger: params?.$ctx?.ga?.trigger || '',
-            signMethod,
           });
         }
       } else {
@@ -214,17 +180,21 @@ const QRHardWareWaiting = ({ params }) => {
     }
   };
 
+  const showErrorChecker = useMemo(() => {
+    return errorMessage !== '' && status == QRHARDWARE_STATUS.SIGN;
+  }, [errorMessage]);
+
   const [scanMessage, setScanMessage] = React.useState();
   const handleScan = (scanMessage) => {
     setScanMessage(scanMessage);
     setStatus(QRHARDWARE_STATUS.RECEIVED);
   };
 
-  const handleSubmit = async () => {
-    // cache signMethod in statsData
-    await wallet.setStatsData({
-      signMethod,
-    });
+  const handleDone = () => {
+    history.push('/');
+  };
+
+  const handleSubmit = () => {
     wallet.submitQRHardwareSignature(
       signPayload!.requestId,
       scanMessage!,
@@ -252,85 +222,7 @@ const QRHardWareWaiting = ({ params }) => {
     }
   }, [status, errorMessage]);
 
-  const [hiddenSwitchButton, setHiddenSwitchButton] = useState(false);
-  const shouldShowSignatureSwitchButton = useMemo(() => {
-    return (
-      canSwitchSignature &&
-      !hiddenSwitchButton &&
-      signMethod === SIGNATURE_METHOD.QRCODE &&
-      ![QRHARDWARE_STATUS.SIGN, QRHARDWARE_STATUS.DONE].includes(status)
-    );
-  }, [status, canSwitchSignature, hiddenSwitchButton, signMethod]);
-
-  const calcSignComponent = useCallback(() => {
-    if (signMethod === SIGNATURE_METHOD.USB) {
-      const onKeystoneWaitingPageDone = () => setIsClickDone(true);
-      const onKeystoneWaitingPageSetErrorMessage = (error) =>
-        setErrorMessage(error);
-      const onKeystoneWaitingPageHandleSuccess = (message) => {
-        setScanMessage(message);
-        wallet.submitQRHardwareSignature(
-          signPayload!.requestId,
-          message,
-          params?.account?.address
-        );
-      };
-      const onKeystoneWaitingPageRetry = async () => {
-        await handleRequestSignature();
-        setStatus(QRHARDWARE_STATUS.SYNC);
-      };
-
-      return (
-        <KeystoneWiredWaiting
-          isDone={status === QRHARDWARE_STATUS.DONE}
-          onRetry={onKeystoneWaitingPageRetry}
-          onDone={onKeystoneWaitingPageDone}
-          payload={signPayload?.payload}
-          errorMessage={errorMessage}
-          setHiddenSwitchButton={setHiddenSwitchButton}
-          setErrorMessage={onKeystoneWaitingPageSetErrorMessage}
-          requestId={signPayload?.requestId}
-          handleCancel={handleCancel}
-          handleSuccess={onKeystoneWaitingPageHandleSuccess}
-        />
-      );
-    }
-
-    return (
-      <>
-        {status === QRHARDWARE_STATUS.SYNC && signPayload && (
-          <Player
-            layoutStyle={shouldShowSignatureSwitchButton ? 'normal' : 'compact'}
-            playerSize={shouldShowSignatureSwitchButton ? 144 : 180}
-            type={signPayload.payload.type}
-            cbor={signPayload.payload.cbor}
-            onSign={handleRequestSignature}
-            brandName={walletBrandContent.brand}
-          />
-        )}
-        {status === QRHARDWARE_STATUS.SIGN && (
-          <Reader
-            requestId={signPayload?.requestId}
-            setErrorMessage={setErrorMessage}
-            brandName={walletBrandContent.brand}
-            onScan={handleScan}
-          />
-        )}
-      </>
-    );
-  }, [
-    wallet,
-    params,
-    status,
-    scanMessage,
-    signPayload,
-    walletBrandContent,
-    signMethod,
-    errorMessage,
-    shouldShowSignatureSwitchButton,
-  ]);
-
-  if (popupStatus && signMethod === SIGNATURE_METHOD.QRCODE) {
+  if (popupStatus) {
     return (
       <ApprovalPopupContainer
         showAnimation
@@ -348,30 +240,23 @@ const QRHardWareWaiting = ({ params }) => {
   }
 
   return (
-    <section className="h-full">
-      <div
-        className={clsx(
-          shouldShowSignatureSwitchButton ? '' : 'justify-center',
-          'flex qrcode-scanner flex-col h-full'
+    <section>
+      <div className="flex justify-center qrcode-scanner">
+        {status === QRHARDWARE_STATUS.SYNC && signPayload && (
+          <Player
+            type={signPayload.payload.type}
+            cbor={signPayload.payload.cbor}
+            onSign={handleRequestSignature}
+            brandName={walletBrandContent.brand}
+          />
         )}
-      >
-        {calcSignComponent()}
-        {shouldShowSignatureSwitchButton && (
-          <SwitchButton
-            className="mt-20"
-            onClick={() => {
-              if (signMethod === SIGNATURE_METHOD.USB) {
-                setSignMethod(SIGNATURE_METHOD.QRCODE);
-              } else {
-                setSignMethod(SIGNATURE_METHOD.USB);
-              }
-            }}
-          >
-            {t('page.signFooterBar.keystone.signWith', {
-              method:
-                signMethod === SIGNATURE_METHOD.QRCODE ? 'USB' : 'QR Code',
-            })}
-          </SwitchButton>
+        {status === QRHARDWARE_STATUS.SIGN && (
+          <Reader
+            requestId={signPayload?.requestId}
+            setErrorMessage={setErrorMessage}
+            brandName={walletBrandContent.brand}
+            onScan={handleScan}
+          />
         )}
       </div>
     </section>

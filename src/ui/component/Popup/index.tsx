@@ -5,13 +5,12 @@ import ReactDOM from 'react-dom';
 import './index.less';
 import { SvgIconCross } from 'ui/assets';
 const closeIcon = (
-  <SvgIconCross className="w-14 fill-current text-r-neutral-foot" />
+  <SvgIconCross className="w-14 fill-current text-gray-content" />
 );
 
 interface PopupProps extends DrawerProps {
   onCancel?(): void;
   children?: ReactNode;
-  isSupportDarkMode?: boolean;
 }
 
 const Popup = ({
@@ -21,18 +20,13 @@ const Popup = ({
   className,
   onClose,
   onCancel,
-  isSupportDarkMode,
   ...rest
 }: PopupProps) => (
   <Drawer
     onClose={onClose || onCancel}
     closable={closable}
     placement={placement}
-    className={clsx(
-      'custom-popup',
-      isSupportDarkMode && 'is-support-darkmode',
-      className
-    )}
+    className={clsx('custom-popup', className)}
     destroyOnClose
     closeIcon={closeIcon}
     {...rest}

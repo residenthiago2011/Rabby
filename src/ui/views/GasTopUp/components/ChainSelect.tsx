@@ -1,3 +1,4 @@
+import LessPalette from '@/ui/style/var-defs';
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ReactComponent as SvgIconArrowDownTriangle } from '@/ui/assets/swap/arrow-caret-down.svg';
@@ -15,7 +16,7 @@ const allMainnetChainEnums = Object.values(CHAINS_BY_NET.mainnet).map(
 );
 
 export const ChainWrapper = styled.div`
-  background: var(--r-neutral-card-2);
+  background: ${LessPalette['@color-bg']};
   border-radius: 4px;
   padding: 16px 12px;
   display: flex;
@@ -38,7 +39,7 @@ export const ChainWrapper = styled.div`
     font-weight: 500;
     font-size: 20px;
     line-height: 23px;
-    color: var(--r-neutral-title-1);
+    color: #13141a;
   }
 `;
 
@@ -93,13 +94,7 @@ export const ChainSelect = ({
           />
           <span className="text">{chainItem?.name || ''}</span>
         </div>
-        {!readonly && (
-          <SvgIconArrowDownTriangle
-            width={24}
-            height={24}
-            className="text-r-neutral-foot"
-          />
-        )}
+        {!readonly && <SvgIconArrowDownTriangle width={24} height={24} />}
       </ChainWrapper>
       {!readonly && (
         <Modal

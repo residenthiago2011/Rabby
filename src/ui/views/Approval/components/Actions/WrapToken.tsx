@@ -72,10 +72,6 @@ const WrapToken = ({
     return map;
   }, [engineResults]);
 
-  const hasReceiver = useMemo(() => {
-    return !isSameAddress(receiver, requireData.sender);
-  }, [requireData, receiver]);
-
   const handleClickRule = (id: string) => {
     const rule = rules.find((item) => item.id === id);
     if (!rule) return;
@@ -136,7 +132,7 @@ const WrapToken = ({
             )}
           </Row>
         </Col>
-        {hasReceiver && (
+        {engineResultMap['1092'] && (
           <Col>
             <Row isTitle>{t('page.signTx.swap.receiver')}</Row>
             <Row>
@@ -145,18 +141,8 @@ const WrapToken = ({
                 <SecurityListItem
                   engineResult={engineResultMap['1092']}
                   id="1092"
-                  warningText={t('page.signTx.swap.unknownAddress')}
+                  dangerText={t('page.signTx.swap.notPaymentAddress')}
                 />
-                {!engineResultMap['1092'] && (
-                  <>
-                    <li>
-                      <Values.AccountAlias address={receiver} />
-                    </li>
-                    <li>
-                      <Values.KnownAddress address={receiver} />
-                    </li>
-                  </>
-                )}
               </ul>
             </Row>
           </Col>

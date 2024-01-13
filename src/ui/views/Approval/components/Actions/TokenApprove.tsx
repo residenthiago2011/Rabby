@@ -197,7 +197,7 @@ const TokenApprove = ({
     const result = new BigNumber(value).isGreaterThan(Number.MAX_SAFE_INTEGER)
       ? String(Number.MAX_SAFE_INTEGER)
       : value;
-    const data = getCustomTxParamsData(raw.data as string, {
+    const data = getCustomTxParamsData(raw.data, {
       customPermissionAmount: result,
       decimals: actionData.token.decimals,
     });
@@ -348,7 +348,6 @@ const TokenApprove = ({
         title={t('page.signTx.tokenApprove.amountPopupTitle')}
         onCancel={() => setEditApproveModalVisible(false)}
         destroyOnClose
-        isSupportDarkMode
       >
         <ApproveAmountModal
           balance={tokenBalance}

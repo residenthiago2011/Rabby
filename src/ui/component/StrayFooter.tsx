@@ -77,7 +77,7 @@ const StrayFooterNav = memo(
         <div
           className={cx(
             'py-20 px-20 w-full flex justify-center stray-footer-nav',
-            hasDivider && 'bg-r-neutral-bg-1 border-t-r-neutral-line border-t'
+            hasDivider && 'bg-white border-gray-divider border-t'
           )}
         >
           {hasBack && (

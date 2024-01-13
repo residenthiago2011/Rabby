@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 const Content = styled.div`
   text-align: center;
   .title {
-    color: var(--r-neutral-title-1);
+    color: #13141a;
     text-align: center;
     font-size: 16px;
     font-weight: 500;
@@ -55,7 +55,7 @@ export const useTestnetCheck = ({
   useEffect(() => {
     if (!isShowTestnet && chain && chain?.isTestnet) {
       const { destroy } = Modal.info({
-        className: 'testnet-check-modal modal-support-darkmode',
+        className: 'testnet-check-modal',
         width: 360,
         centered: true,
         content: (

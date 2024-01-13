@@ -4,5 +4,3 @@ dist-*
 .yarn
 .DS_Store
 yarn-error
-
-tmp/*.zip

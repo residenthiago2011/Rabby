@@ -31,11 +31,10 @@ export const SlippageItem = styled.div<{
   height: 28px;
   font-weight: 500;
   font-size: 12px;
-  background: var(--r-neutral-card-2, #f2f4f7);
+  background: #f5f6fa;
   border-radius: 4px;
   &:hover {
-    /* background: rgba(134, 151, 255, 0.2); */
-    background: var(--r-neutral-card-3, #f7fafc);
+    background: rgba(134, 151, 255, 0.2);
   }
 `;
 
@@ -51,8 +50,8 @@ const Wrapper = styled.section`
   .input {
     font-weight: 500;
     font-size: 12px;
-    /* background: #f5f6fa;
-    border: 1px solid #e5e9ef; */
+    background: #f5f6fa;
+    border: 1px solid #e5e9ef;
     border-radius: 4px;
 
     &:placeholder-shown {
@@ -168,7 +167,7 @@ export const Slippage = memo((props: SlippageProps) => {
         }}
       >
         <span>{t('page.swap.slippage-tolerance')}</span>
-        <span className="font-medium text-r-neutral-title-1 inline-flex items-center">
+        <span className="font-medium text-gray-title inline-flex items-center">
           <span className={clsx(!!tips && 'text-orange')}>
             {displaySlippage}%{' '}
           </span>
@@ -181,7 +180,7 @@ export const Slippage = memo((props: SlippageProps) => {
           />
         </span>
       </div>
-      <Wrapper className="widget-has-ant-input">
+      <Wrapper>
         <div
           className={clsx(
             'slippage',

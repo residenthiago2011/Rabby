@@ -13,6 +13,8 @@ export const IconRefresh = memo((props: React.SVGProps<SVGSVGElement>) => {
         'arrow-loading cursor-pointer',
         className || 'text-blue-light'
       )}
+      width="36"
+      height="36"
       {...other}
     >
       <path

@@ -66,7 +66,7 @@ export const ApprovalContractItem = ({
         .find((e) => e.serverId === chain)
         ?.scanLink?.replace('/tx/_s_', '');
       return (
-        <div className="flex items-center text-r-neutral-body">
+        <div className="flex items-center text-gray-subTitle">
           <span
             className="flex items-center cursor-pointer"
             onClick={(e) => {
@@ -82,7 +82,7 @@ export const ApprovalContractItem = ({
               width={14}
               height={14}
               viewBox="0 0 14 14"
-              className="ml-[4px] text-r-neutral-body"
+              className="ml-[4px] text-gray-subTitle"
             />
           </span>
 
@@ -172,7 +172,7 @@ export const ApprovalContractItem = ({
           </div>
         </div>
 
-        <span className="text-[13px] text-r-neutral-body ml-auto ">
+        <span className="text-[13px] text-gray-subTitle ml-auto ">
           {item.list.length}{' '}
           {!onSelect && 'Approval' + (item.list.length > 1 ? 's' : '')}
           {}

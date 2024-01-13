@@ -1,22 +1,16 @@
-import browser, { Windows } from 'webextension-polyfill';
+import { browser } from 'webextension-polyfill-ts';
 import Events from 'events';
 import { ethErrors } from 'eth-rpc-errors';
 import { v4 as uuidv4 } from 'uuid';
 import * as Sentry from '@sentry/browser';
 import { EthereumProviderError } from 'eth-rpc-errors/dist/classes';
 import { winMgr } from 'background/webapi';
-import {
-  CHAINS,
-  KEYRING_CATEGORY_MAP,
-  IS_LINUX,
-  IS_VIVALDI,
-  IS_CHROME,
-  KEYRING_CATEGORY,
-} from 'consts';
+import { CHAINS, KEYRING_CATEGORY_MAP, IS_LINUX, IS_CHROME } from 'consts';
 import transactionHistoryService from './transactionHistory';
 import preferenceService from './preference';
 import stats from '@/stats';
 import BigNumber from 'bignumber.js';
+import { permissionService } from '.';
 
 type IApprovalComponents = typeof import('@/ui/views/Approval/components');
 type IApprovalComponent = IApprovalComponents[keyof IApprovalComponents];
@@ -46,43 +40,16 @@ const QUEUE_APPROVAL_COMPONENTS_WHITELIST = [
   'WatchAddressWaiting',
   'CommonWaiting',
   'PrivatekeyWaiting',
-  'CoinbaseWaiting',
 ];
-
-export type StatsData = {
-  signed: boolean;
-  signedSuccess: boolean;
-  submit: boolean;
-  submitSuccess: boolean;
-  type: string;
-  chainId: string;
-  category: KEYRING_CATEGORY;
-  preExecSuccess: boolean;
-  createBy: string;
-  source: any;
-  trigger: any;
-  reported: boolean;
-  signMethod?: string;
-};
 
 // something need user approval in window
 // should only open one window, unfocus will close the current notification
 class NotificationService extends Events {
   currentApproval: Approval | null = null;
-  dappManager = new Map<
-    string,
-    {
-      lastRejectTimestamp: number;
-      lastRejectCount: number;
-      blockedTimestamp: number;
-      isBlocked: boolean;
-    }
-  >();
   _approvals: Approval[] = [];
   notifiWindowId: null | number = null;
   isLocked = false;
   currentRequestDeferFn?: () => void;
-  statsData: StatsData | undefined;
 
   get approvals() {
     return this._approvals;
@@ -115,7 +82,6 @@ class NotificationService extends Events {
     });
 
     winMgr.event.on('windowFocusChange', (winId: number) => {
-      if (IS_VIVALDI) return;
       if (IS_CHROME && winId === chrome.windows.WINDOW_ID_NONE && IS_LINUX) {
         // When sign on Linux, will focus on -1 first then focus on sign window
         return;
@@ -188,7 +154,6 @@ class NotificationService extends Events {
 
     const approval = this.currentApproval;
 
-    this.clearLastRejectDapp();
     this.deleteApproval(approval);
 
     if (this.approvals.length > 0) {
@@ -201,8 +166,8 @@ class NotificationService extends Events {
   };
 
   rejectApproval = async (err?: string, stay = false, isInternal = false) => {
-    this.addLastRejectDapp();
     const approval = this.currentApproval;
+
     if (this.approvals.length <= 1) {
       await this.clear(stay); // TODO: FIXME
     }
@@ -228,19 +193,6 @@ class NotificationService extends Events {
   };
 
   requestApproval = async (data, winProps?): Promise<any> => {
-    const origin = this.getOrigin(data);
-    if (origin) {
-      const dapp = this.dappManager.get(origin);
-      // is blocked and less 1 min
-      if (
-        dapp?.isBlocked &&
-        Date.now() - dapp.blockedTimestamp < 60 * 1000 * 1
-      ) {
-        throw ethErrors.provider.userRejectedRequest(
-          'User rejected the request.'
-        );
-      }
-    }
     const currentAccount = preferenceService.getCurrentAccount();
     const reportExplain = (signingTxId?: string) => {
       const signingTx = signingTxId
@@ -331,7 +283,17 @@ class NotificationService extends Events {
           new BigNumber(chain.hex).isEqualTo(chainId)
         );
 
-        if (chain) {
+        const connectSite = permissionService.getConnectedSite(data.origin);
+        const currentChain = connectSite
+          ? CHAINS[connectSite?.chain]
+          : undefined;
+
+        const isSwitchMainOrTest =
+          chain &&
+          currentChain &&
+          !!chain.isTestnet !== !!currentChain.isTestnet;
+
+        if (!isSwitchMainOrTest && chain) {
           this.resolveApproval(null);
           return;
         }
@@ -361,7 +323,6 @@ class NotificationService extends Events {
   };
 
   rejectAllApprovals = () => {
-    this.addLastRejectDapp();
     this.approvals.forEach((approval) => {
       approval.reject &&
         approval.reject(
@@ -396,12 +357,6 @@ class NotificationService extends Events {
     });
   };
 
-  updateNotificationWinProps = (winProps: Windows.UpdateUpdateInfoType) => {
-    if (this.notifiWindowId !== null) {
-      browser.windows.update(this.notifiWindowId!, winProps);
-    }
-  };
-
   setCurrentRequestDeferFn = (fn: () => void) => {
     this.currentRequestDeferFn = fn;
   };
@@ -409,80 +364,6 @@ class NotificationService extends Events {
   callCurrentRequestDeferFn = () => {
     return this.currentRequestDeferFn?.();
   };
-
-  setStatsData = (data?: StatsData) => {
-    this.statsData = data;
-  };
-
-  getStatsData = () => {
-    return this.statsData;
-  };
-
-  private addLastRejectDapp() {
-    // not Rabby dapp
-    if (this.currentApproval?.data?.params?.$ctx) return;
-    const origin = this.getOrigin();
-    if (!origin) {
-      return;
-    }
-    const dapp = this.dappManager.get(origin);
-    // same origin and less 1 min
-    if (dapp && Date.now() - dapp.lastRejectTimestamp < 60 * 1000) {
-      dapp.lastRejectCount = dapp.lastRejectCount + 1;
-      dapp.lastRejectTimestamp = Date.now();
-    } else {
-      this.dappManager.set(origin, {
-        lastRejectTimestamp: Date.now(),
-        lastRejectCount: 1,
-        blockedTimestamp: 0,
-        isBlocked: false,
-      });
-    }
-  }
-
-  private clearLastRejectDapp() {
-    const origin = this.getOrigin();
-    if (!origin) {
-      return;
-    }
-    this.dappManager.delete(origin);
-  }
-
-  checkNeedDisplayBlockedRequestApproval = () => {
-    const origin = this.getOrigin();
-    if (!origin) {
-      return false;
-    }
-    const dapp = this.dappManager.get(origin);
-    if (!dapp) return false;
-    // less 1 min and reject count more than 2 times
-    if (
-      Date.now() - dapp.lastRejectTimestamp < 60 * 1000 &&
-      dapp.lastRejectCount >= 2
-    ) {
-      return true;
-    }
-    return false;
-  };
-  checkNeedDisplayCancelAllApproval = () => {
-    return this.approvals.length > 1;
-  };
-
-  blockedDapp = () => {
-    const origin = this.getOrigin();
-    if (!origin) {
-      return;
-    }
-    const dapp = this.dappManager.get(origin);
-    if (!dapp) return;
-
-    dapp.isBlocked = true;
-    dapp.blockedTimestamp = Date.now();
-  };
-
-  private getOrigin(data = this.currentApproval?.data) {
-    return data?.params?.origin || data?.origin;
-  }
 }
 
 export default new NotificationService();

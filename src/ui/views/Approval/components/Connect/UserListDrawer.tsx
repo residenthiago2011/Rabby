@@ -10,7 +10,7 @@ const UserListDrawerWrapper = styled.div`
     font-weight: 500;
     font-size: 22px;
     line-height: 26px;
-    color: var(--r-neutral-title-1, #192945);
+    color: #13141a;
     .logo {
       width: 24px;
       height: 24px;
@@ -20,7 +20,7 @@ const UserListDrawerWrapper = styled.div`
 `;
 
 const Footer = styled.div`
-  background: var(--r-neutral-card-2, #f2f4f7);
+  background: #f5f6fa;
   border-radius: 6px;
   .item {
     display: flex;
@@ -31,13 +31,13 @@ const Footer = styled.div`
     font-weight: 500;
     font-size: 13px;
     line-height: 15px;
-    color: var(--r-neutral-title-1, #192945);
+    color: #13141a;
     position: relative;
     border: 1px solid transparent;
     .rabby-checkbox__wrapper {
       .rabby-checkbox {
-        border: 1px solid var(--r-neutral-line);
-        background-color: var(--r-neutral-foot) !important;
+        border: 1px solid #707280;
+        background-color: #fff !important;
       }
       &.checked {
         .rabby-checkbox {
@@ -53,7 +53,7 @@ const Footer = styled.div`
       left: 18px;
       width: 328px;
       height: 1px;
-      background-color: var(--r-neutral-line, #e5e9ef);
+      background-color: #e5e9ef;
     }
     &:hover {
       background: var(--r-blue-light-1, #eef1ff);
@@ -115,7 +115,6 @@ const UserListDrawer = ({
       closable
       title={t('page.connect.manageWhiteBlackList')}
       className="user-list-drawer"
-      isSupportDarkMode
     >
       <GlobalStyle />
       <UserListDrawerWrapper>
@@ -145,9 +144,7 @@ const UserListDrawer = ({
           className="item"
           onClick={() => onChange({ onBlacklist: false, onWhitelist: true })}
         >
-          <div className="text-r-green-default">
-            {t('page.connect.trusted')}
-          </div>
+          <div className="text-green">{t('page.connect.trusted')}</div>
           <div>
             <Checkbox
               checked={onWhitelist}
@@ -161,7 +158,7 @@ const UserListDrawer = ({
           className="item"
           onClick={() => onChange({ onBlacklist: true, onWhitelist: false })}
         >
-          <div className="text-r-red-default">{t('page.connect.blocked')}</div>
+          <div className="text-red">{t('page.connect.blocked')}</div>
           <div>
             <Checkbox
               checked={onBlacklist}

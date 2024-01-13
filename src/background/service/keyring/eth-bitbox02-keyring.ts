@@ -1,6 +1,6 @@
 import 'regenerator-runtime/runtime';
 import EventEmitter from 'events';
-import browser from 'webextension-polyfill';
+import { browser } from 'webextension-polyfill-ts';
 
 import { BitBox02API, getDevicePath, constants } from 'bitbox02-api';
 

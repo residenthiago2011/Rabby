@@ -4,7 +4,7 @@ import {
   NFTItem,
   TransferingNFTItem,
 } from '@rabby-wallet/rabby-api/dist/types';
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { ellipsisTokenSymbol } from 'ui/utils/token';
 import styled from 'styled-components';
 import { TokenLabel } from './Values';
@@ -32,7 +32,7 @@ const Wrapper = styled.div`
     font-weight: 500;
     font-size: 15px;
     line-height: 18px;
-    color: var(--r-neutral-title-1, #192945);
+    color: #333333;
     flex-shrink: 0;
     overflow: hidden;
     text-overflow: ellipsis;

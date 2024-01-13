@@ -8,14 +8,13 @@ import {
 import { HDPathType } from './HDPathTypeButton';
 import { MainContainer } from './MainContainer';
 import { HDManagerStateContext } from './utils';
-import { ReactComponent as RcSettingSVG } from 'ui/assets/setting-outline-cc.svg';
-import { ReactComponent as RcHardwareSVG } from 'ui/assets/import/hardware-cc.svg';
+import { ReactComponent as SettingSVG } from 'ui/assets/setting-outline.svg';
+import { ReactComponent as HardwareSVG } from 'ui/assets/import/hardware.svg';
 import { useAsyncRetry } from 'react-use';
 import { useWallet } from '@/ui/utils';
-import { HARDWARE_KEYRING_TYPES, WALLET_BRAND_TYPES } from '@/constant';
+import { HARDWARE_KEYRING_TYPES } from '@/constant';
 import { useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useKeystoneUSBErrorCatcher } from '@/utils/keystone';
 
 interface Props {
   brand?: string;
@@ -28,7 +27,6 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
   const { getCurrentAccounts, currentAccounts, keyringId } = React.useContext(
     HDManagerStateContext
   );
-  const isKeystone = brand === 'Keystone';
   const [visibleAdvanced, setVisibleAdvanced] = React.useState(false);
   const [setting, setSetting] = React.useState<SettingData>(
     DEFAULT_SETTING_DATA
@@ -37,7 +35,6 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
   const wallet = useWallet();
   const history = useHistory();
   const currentAccountsRef = React.useRef(currentAccounts);
-  const keystoneErrorCatcher = useKeystoneUSBErrorCatcher();
 
   const openAdvanced = React.useCallback(() => {
     if (loading) {
@@ -46,90 +43,23 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
     setVisibleAdvanced(true);
   }, [loading]);
 
-  const fetchInitCurrentPathType = React.useCallback(
-    async (nextSetting: SettingData = setting) => {
-      let currentType = HDPathType.BIP44;
-      try {
-        currentType = await wallet.requestKeyring(
-          KEYSTONE_TYPE,
-          'getCurrentUsedHDPathType',
-          keyringId
-        );
-      } catch (err) {
-        currentType = HDPathType.BIP44;
-      }
-
-      setSetting({
-        ...nextSetting,
-        type: currentType,
-      });
-    },
-    []
-  );
-
-  const fetchCurrentAccounts = React.useCallback(
-    async (nextSetting?: SettingData) => {
-      setLoading(true);
-      await getCurrentAccounts();
-      await fetchInitCurrentPathType(nextSetting);
-      setLoading(false);
-    },
-    []
-  );
+  const fetchCurrentAccounts = React.useCallback(async () => {
+    setLoading(true);
+    await getCurrentAccounts();
+    setSetting({
+      ...setting,
+      type: HDPathType.BIP44,
+    });
+    setLoading(false);
+  }, []);
   const fetchCurrentAccountsRetry = useAsyncRetry(fetchCurrentAccounts);
-
-  const removeAddressAndForgetDevice = React.useCallback(
-    async (removeEmptyKeyrings?: boolean) => {
-      await Promise.all(
-        currentAccountsRef.current?.map(async (account) =>
-          wallet.removeAddress(
-            account.address,
-            KEYSTONE_TYPE,
-            undefined,
-            removeEmptyKeyrings
-          )
-        )
-      );
-      await wallet.requestKeyring(KEYSTONE_TYPE, 'forgetDevice', keyringId);
-    },
-    [currentAccountsRef, wallet, keyringId]
-  );
 
   const onConfirmAdvanced = React.useCallback(async (data: SettingData) => {
     setVisibleAdvanced(false);
-
-    const { type = HDPathType.BIP44, ...rest } = data;
-    if (isKeystone) {
-      try {
-        setLoading(true);
-
-        if (type !== setting.type) {
-          /**
-           * This code is written to be consistent with the behavior of importing wallets via QR Code.
-           */
-          await removeAddressAndForgetDevice(false);
-        }
-
-        await wallet.requestKeyring(
-          KEYSTONE_TYPE,
-          'getAddressesViaUSB',
-          keyringId,
-          type
-        );
-        await getCurrentAccounts();
-        setLoading(false);
-      } catch (error) {
-        history.goBack();
-        keystoneErrorCatcher(error);
-      }
-      rest.startNo =
-        type === HDPathType.LedgerLive
-          ? DEFAULT_SETTING_DATA.startNo
-          : rest.startNo;
-    }
-    await fetchCurrentAccounts({
-      type,
-      ...rest,
+    await fetchCurrentAccounts();
+    setSetting({
+      ...data,
+      type: HDPathType.BIP44,
     });
   }, []);
 
@@ -155,18 +85,24 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
       content: t('page.newAddress.hd.qrCode.switch.content', [brand]),
       okText: t('global.confirm'),
       onOk: async () => {
-        await removeAddressAndForgetDevice(true);
-        if (brand === WALLET_BRAND_TYPES.KEYSTONE) {
-          history.push('/import/hardware/keystone');
-        } else {
-          history.push(`/import/hardware/qrcode?brand=${brand}`);
-        }
+        await Promise.all(
+          currentAccountsRef.current?.map(async (account) =>
+            wallet.removeAddress(
+              account.address,
+              KEYSTONE_TYPE,
+              undefined,
+              true
+            )
+          )
+        );
+        await wallet.requestKeyring(KEYSTONE_TYPE, 'forgetDevice', keyringId);
+        history.goBack();
       },
       okCancel: false,
       centered: true,
       closable: true,
       maskClosable: true,
-      className: 'hd-manager-switch-modal modal-support-darkmode',
+      className: 'hd-manager-switch-modal',
     });
   }, []);
 
@@ -174,13 +110,13 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
     <>
       <div className="toolbar">
         <div className="toolbar-item" onClick={openSwitchHD}>
-          <RcHardwareSVG className="icon text-r-neutral-title1" />
+          <HardwareSVG className="icon" />
           <span className="title">
             {t('page.newAddress.hd.qrCode.switchAnother', [brand])}
           </span>
         </div>
         <div className="toolbar-item" onClick={openAdvanced}>
-          <RcSettingSVG className="icon text-r-neutral-title1" />
+          <SettingSVG className="icon" />
           <span className="title">
             {t('page.newAddress.hd.advancedSettings')}
           </span>
@@ -196,7 +132,7 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
 
       <Modal
         destroyOnClose
-        className="AdvancedModal modal-support-darkmode"
+        className="AdvancedModal"
         title={t('page.newAddress.hd.customAddressHdPath')}
         visible={visibleAdvanced}
         centered
@@ -207,7 +143,6 @@ export const QRCodeManager: React.FC<Props> = ({ brand }) => {
         <AdvancedSettings
           onConfirm={onConfirmAdvanced}
           initSettingData={setting}
-          brand={brand}
         />
       </Modal>
     </>

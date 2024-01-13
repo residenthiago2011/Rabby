@@ -57,14 +57,14 @@ export const formatSecurityEngineCtx = ({
   return {};
 };
 
-export const getActionTypeText = (data: TextActionData | null) => {
+export const getActionTypeText = (data: TextActionData) => {
   const { t } = i18n;
 
-  if (data?.createKey) {
+  if (data.createKey) {
     return t('page.signTypedData.createKey.title');
   }
-  if (data?.verifyAddress) {
+  if (data.verifyAddress) {
     return t('page.signTypedData.verifyAddress.title');
   }
-  return t('page.signTx.unknownAction');
+  return '';
 };

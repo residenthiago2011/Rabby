@@ -5,7 +5,6 @@ import { GasCache, ChainGas } from './preference';
 import { CEX, DEX } from '@/constant';
 import { OpenApiService } from '@rabby-wallet/rabby-api';
 import { openapiService } from 'background/service';
-import { TokenItem } from './openapi';
 
 type ViewKey = keyof typeof CEX | keyof typeof DEX;
 
@@ -13,27 +12,19 @@ export type SwapServiceStore = {
   gasPriceCache: GasCache;
   selectedDex: DEX_ENUM | null;
   selectedChain: CHAINS_ENUM | null;
-  selectedFromToken?: TokenItem;
-  selectedToToken?: TokenItem;
   unlimitedAllowance: boolean;
   viewList: Record<ViewKey, boolean>;
   tradeList: Record<ViewKey, boolean>;
-  sortIncludeGasFee?: boolean;
-  preferMEVGuarded: boolean;
 };
 
 class SwapService {
   store: SwapServiceStore = {
     gasPriceCache: {},
     selectedChain: null,
-    selectedFromToken: undefined,
-    selectedToToken: undefined,
     selectedDex: null,
     unlimitedAllowance: false,
     viewList: {} as SwapServiceStore['viewList'],
     tradeList: {} as SwapServiceStore['tradeList'],
-    sortIncludeGasFee: false,
-    preferMEVGuarded: false,
   };
 
   init = async () => {
@@ -46,7 +37,6 @@ class SwapService {
         unlimitedAllowance: false,
         viewList: {} as SwapServiceStore['viewList'],
         tradeList: {} as SwapServiceStore['tradeList'],
-        preferMEVGuarded: false,
       },
     });
     if (storage) {
@@ -117,20 +107,6 @@ class SwapService {
     this.store.selectedChain = chain;
   };
 
-  getSelectedFromToken = () => {
-    return this.store.selectedFromToken;
-  };
-  getSelectedToToken = () => {
-    return this.store.selectedToToken;
-  };
-
-  setSelectedFromToken = (token?: TokenItem) => {
-    this.store.selectedFromToken = token;
-  };
-  setSelectedToToken = (token?: TokenItem) => {
-    this.store.selectedToToken = token;
-  };
-
   getUnlimitedAllowance = () => {
     return this.store.unlimitedAllowance;
   };
@@ -167,14 +143,6 @@ class SwapService {
     };
   };
 
-  getSwapSortIncludeGasFee = () => {
-    return this.store.sortIncludeGasFee || false;
-  };
-
-  setSwapSortIncludeGasFee = (bool: boolean) => {
-    this.store.sortIncludeGasFee = bool;
-  };
-
   txQuotes: Record<
     string,
     Omit<Parameters<OpenApiService['postSwap']>[0], 'tx' | 'tx_id'>
@@ -205,14 +173,6 @@ class SwapService {
         tx_id: hash,
       });
     }
-  };
-
-  getSwapPreferMEVGuarded = () => {
-    return this.store.preferMEVGuarded || false;
-  };
-
-  setSwapPreferMEVGuarded = (bool: boolean) => {
-    this.store.preferMEVGuarded = bool;
   };
 }
 

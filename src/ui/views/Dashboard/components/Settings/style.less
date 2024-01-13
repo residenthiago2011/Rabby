@@ -16,7 +16,7 @@
   }
 
   .setting-block .setting-title {
-    color: var(--r-neutral-foot, #6a7587);
+    color: @color-comment;
     font-size: 12px;
     font-style: normal;
     font-weight: 400;
@@ -28,7 +28,7 @@
   }
 
   .setting-items {
-    background: var(--r-neutral-card-2, rgba(255, 255, 255, 0.06));
+    background: @color-bg;
     border-radius: @radius-value;
   }
 
@@ -77,12 +77,12 @@
     }
   }
   .field {
-    background: var(--r-neutral-card-2, rgba(255, 255, 255, 0.06));
+    background: @color-bg;
     border-radius: @radius-value;
     margin-bottom: 8px;
     font-size: 14px;
     line-height: 16px;
-    color: var(--r-neutral-title-1, #f7fafc);
+    color: @color-title;
     padding: 0 16px;
     border: 1px solid transparent;
     min-height: 52px;
@@ -144,14 +144,13 @@
   .resolve-conflict-modal,
   .openapi-modal,
   .reset-account-modal,
-  .auto-lock-modal,
-  .switch-theme-modal {
+  .auto-lock-modal {
     position: absolute;
     width: 100%;
     height: 100%;
     left: 0;
     top: 0;
-    background-color: var(--r-neutral-bg-1, #575b70);
+    background-color: #fff;
     transform: translateX(100%);
     transition: transform 0.3s;
     padding: 20px;
@@ -163,7 +162,7 @@
     .reset-account-content {
       font-size: 14px;
       line-height: 20px;
-      color: var(--r-neutral-body, #d3d8e0);
+      color: #4b4d59;
       white-space: pre-wrap;
     }
     .reset-account-warn {
@@ -176,8 +175,7 @@
       width: 100%;
       text-align: center;
     }
-    .auto-lock-option-list,
-    .switch-theme-option-list {
+    .auto-lock-option-list {
       overflow: auto;
       max-height: calc(100% - 48px);
       &-item {
@@ -185,10 +183,10 @@
         height: 52px;
         padding: 17px 15px;
         border-radius: 6px;
-        background: var(--r-neutral-card-2, rgba(255, 255, 255, 0.06));
+        background: #f5f6fa;
         align-items: center;
 
-        color: var(--r-neutral-title-1, #f7fafc);
+        color: #13141a;
         font-size: 14px;
         line-height: 16px;
         border: 1px solid transparent;
@@ -266,7 +264,7 @@
         font-weight: 500;
         font-size: 16px;
         line-height: 19px;
-        color: var(--r-neutral-title-1, #f7fafc);
+        color: @color-title;
         display: flex;
         align-items: center;
         margin-bottom: 5px;
@@ -280,8 +278,4 @@
       }
     }
   }
-}
-
-.settings-popup-wrapper .ant-drawer-content {
-  background: var(--r-neutral-bg-1, #575b70);
 }

@@ -1,4 +1,4 @@
-import browser, { Tabs, Windows } from 'webextension-polyfill';
+import { Tabs, browser, Windows } from 'webextension-polyfill-ts';
 import { WalletController, WalletControllerType } from './index';
 import { getOriginFromUrl } from '@/utils';
 

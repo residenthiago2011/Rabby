@@ -5,18 +5,36 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import ClipboardJS from 'clipboard';
+import { message } from 'antd';
 import { useWallet } from 'ui/utils';
 import clsx from 'clsx';
 import { ALIAS_ADDRESS, CHAINS_ENUM } from '@/constant';
 import { openInTab } from '@/ui/utils';
 import { findChainByEnum } from '@/utils/chain';
-import { copyAddress } from '@/ui/utils/clipboard';
+import { copyTextToClipboard } from '@/ui/utils/clipboard';
 
+import IconSuccess from 'ui/assets/success.svg';
 import IconAddressCopy from 'ui/assets/icon-copy-2.svg';
 import IconExternal from 'ui/assets/icon-share.svg';
 import './index.less';
 import { useTranslation } from 'react-i18next';
-import { getAddressScanLink } from '@/utils';
+
+function tipCopied(addr: string, t: any) {
+  message.success({
+    duration: 3,
+    icon: <i />,
+    content: (
+      <div>
+        <div className="flex gap-4 mb-4">
+          <img src={IconSuccess} alt="" />
+          {t('global.copied')}
+        </div>
+        <div className="text-white">{addr}</div>
+      </div>
+    ),
+  });
+}
 
 interface NameAndAddressProps {
   className?: string;
@@ -65,7 +83,16 @@ const NameAndAddress = ({
   };
   const localName = alianName || '';
   const handleCopyContractAddress = () => {
-    copyAddress(address);
+    const clipboard = new ClipboardJS('.name-and-address', {
+      text: function () {
+        return address;
+      },
+    });
+
+    clipboard.on('success', () => {
+      tipCopied(address, t);
+      clipboard.destroy();
+    });
   };
 
   const handleClickCopyIcon = useCallback(
@@ -75,7 +102,9 @@ const NameAndAddress = ({
       >[0]
     ) => {
       evt.stopPropagation();
-      copyAddress(address);
+      copyTextToClipboard(address).then(() => {
+        tipCopied(address, t);
+      });
     },
     [address]
   );
@@ -83,8 +112,10 @@ const NameAndAddress = ({
   const handleClickContractId = () => {
     if (!chainEnum) return;
     const chainItem = findChainByEnum(chainEnum);
-    if (!chainItem) return;
-    openInTab(getAddressScanLink(chainItem?.scanLink, address), false);
+    openInTab(
+      chainItem?.scanLink.replace(/tx\/_s_/, `address/${address}`),
+      false
+    );
   };
 
   useEffect(() => {

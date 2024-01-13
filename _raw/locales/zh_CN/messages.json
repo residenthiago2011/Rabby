@@ -30,9 +30,7 @@
     "Loading": "加载中",
     "Balance": "余额",
     "Done": "完成",
-    "nonce": "nonce",
-    "Nonce": "Nonce",
-    "tryAgain": "再试一次"
+    "nonce": "nonce"
   },
   "page": {
     "transactions": {
@@ -52,11 +50,6 @@
       "txHistory": {
         "tipInputData": "这笔交易有留言",
         "parseInputDataError": "解析留言失败"
-      },
-      "filterScam": {
-        "title": "隐藏欺诈交易",
-        "loading": "数据加载需要一定时间，且可能会有延迟",
-        "btn": "隐藏欺诈交易"
       }
     },
     "dashboard": {
@@ -124,10 +117,7 @@
           "count": "{{count}} in"
         },
         "whatsNew": "更新内容",
-        "importType": "由 {{type}} 导入",
-        "missingDataTooltip": "由于 {{text}}的当前网络问题，地址余额可能无法更新。",
-        "chain": " 链、",
-        "chainEnd": " 链"
+        "importType": "由 {{type}} 导入"
       },
       "recentConnection": {
         "disconnected": "已断开连接",
@@ -219,9 +209,7 @@
           "label": "设置",
           "metamaskPreferredDapps": "优先使用MetaMask连接的Dapp",
           "enableTestnets": "启用测试网",
-          "currentLanguage": "当前语言",
-          "toggleThemeMode": "主题模式",
-          "themeMode": "主题模式"
+          "currentLanguage": "当前语言"
         },
         "supportedChains": "支持的链",
         "testnetBackendServiceUrl": "测试网后端服务 URL",
@@ -301,7 +289,6 @@
       },
       "hd": {
         "howToConnectLedger": "如何连接 Ledger",
-        "howToConnectKeystone": "如何连接 Keystone",
         "userRejectedTheRequest": "用户拒绝了请求",
         "ledger": {
           "doc1": "插入 Ledger",
@@ -309,17 +296,7 @@
           "doc3": "打开 Ethereum 应用程序",
           "reconnect": "如果无法连接，请尝试<1>从头开始重新连接</1>"
         },
-        "keystone": {
-          "title": "*仅Keystone 3(Pro)支持USB连接",
-          "doc1": "插入一个Keystone",
-          "doc2": "输入密码以解锁",
-          "doc3": "批准与电脑的连接",
-          "reconnect": "如果无法使用，请尝试<1>从头开始重新连接。</1>"
-        },
         "howToSwitch": "如何切换"
-      },
-      "GnosisWrongChainAlertBar": {
-        "warning": "Safe 地址不支持 {{chain}}"
       }
     },
     "chainList": {
@@ -394,9 +371,7 @@
         "verifySeedPhrase": "验证助记词",
         "fillInTheBackupSeedPhraseInOrder": "按顺序填写备份助记词",
         "clearAll": "全部清除",
-        "wordPhrase": "我有一个 <1>{{count}}</1> 词的助记词",
-        "pastedAndClear": "已粘贴并清空剪切板",
-        "inputInvalidCount": "有{{count}}处输入内容不符合助记词规范，请检查"
+        "wordPhrase": "我有一个 <1>{{count}}</1> 词的助记词"
       },
       "metamask": {
         "step1": "从 MetaMask 导出助记词或私钥  <br/><1>查看操作指南<1/></1>",
@@ -436,18 +411,6 @@
         "permissionsAuthorized": "权限已授权",
         "nowYouCanReInitiateYourTransaction": "现在你可以重新发起你的交易",
         "allow": "允许"
-      },
-      "keystone": {
-        "title": "连接Keystone",
-        "allowRabbyPermissionsTitle": "允许Rabby访问以下权限：",
-        "keystonePermission1": "连接至USB设备",
-        "keystonePermissionTip": "请点击下方的“允许”，并在弹出窗口中授权访问您的 Keystone",
-        "noDeviceFoundError": "请插入一个Keystone",
-        "deviceIsLockedError": "输入密码以解锁",
-        "deviceRejectedExportAddress": "请批准与 Rabby 的连接",
-        "deviceIsBusy": "设备正在忙碌中",
-        "exportAddressJustAllowedOnHomePage": "仅在 Keystone 主页上允许导出地址",
-        "unknowError": "未知错误，请再试一次"
       },
       "walletConnect": {
         "connectYour": "连接你的",
@@ -541,10 +504,7 @@
         },
         "mnemonic": {
           "hdPathType": {
-            "default": "默认：使用导入助记词的默认 HDpath",
-            "ledgerLive": "Ledger Live：Ledger 官方 HDpath",
-            "bip44": "BIP44标准：BIP44 协议定义的 HDpath",
-            "legacy": "旧版：MEW / Mycrypto 使用的 HDpath"
+            "default": "默认：使用导入助记词的默认 HDpath"
           },
           "hdPathTypeNoChain": {
             "default": "默认：使用导入助记词的默认 HDpath"
@@ -569,14 +529,10 @@
         },
         "keystone": {
           "hdPathType": {
-            "bip44": "BIP44：BIP44协议定义的 HDpath",
-            "ledgerLive": "Ledger Live：Ledger 官方 HDpath。只能通过Ledger Live路径管理10个地址。",
-            "legacy": "旧版：MEW / Mycrypto 使用的 HDpath"
+            "bip44": "BIP44：BIP44协议定义的 HDpath"
           },
           "hdPathTypeNochain": {
-            "bip44": "BIP44：BIP44协议定义的 HDpath",
-            "ledgerLive": "Ledger Live：Ledger 官方 HDpath。只能通过Ledger Live路径管理10个地址。",
-            "legacy": "旧版：MEW / Mycrypto 使用的 HDpath"
+            "bip44": "BIP44：BIP44协议定义的 HDpath"
           }
         },
         "bitbox02": {
@@ -598,7 +554,6 @@
         "connectedToOnekey": "连接 Onekey",
         "manageSeedPhrase": "管理助记词",
         "manageGridplus": "管理 Gridplus",
-        "manageImtokenOffline": "管理 imToken",
         "manageKeystone": "管理 Keystone",
         "manageAirgap": "管理 Airgap",
         "manageCoolwallet": "管理 CoolWallet",
@@ -668,50 +623,16 @@
           "canceled": "已取消",
           "failed": "交易失败",
           "pending": "待完成",
-          "submitFailed": "提交失败",
-          "pendingBroadcast": "Pending: 等待广播",
-          "pendingBroadcasted": "Pending: 已广播",
-          "withdrawed": "已快捷取消",
-          "pendingBroadcastFailed": "Pending: 广播失败"
+          "submitFailed": "提交失败"
         },
         "tips": {
           "canNotCancel": "无法加速或取消：不是第一个待完成的交易",
-          "pendingDetail": "只会有一笔交易成功完成，而且一般是 Gas Price 最高的一笔交易将成功",
-          "pendingBroadcastRetry": "广播失败，上次广播时间：{{pushAt}}",
-          "pendingBroadcastRetryBtn": "重新广播",
-          "pendingBroadcast": "已设置为省Gas广播模式，正在等链上Gas较低的时广播。最晚将在创建后{{deadline}}小时后广播。",
-          "pendingBroadcastBtn": "立即广播"
+          "pendingDetail": "只会有一笔交易成功完成，而且一般是 Gas Price 最高的一笔交易将成功"
         },
         "txType": {
           "cancel": "取消交易",
           "initial": "发起交易",
           "speedUp": "加速交易"
-        },
-        "MempoolList": {
-          "empty": "未发现包含这笔交易的节点",
-          "reBroadcastBtn": "重新广播"
-        },
-        "message": {
-          "broadcastSuccess": "已广播",
-          "cancelSuccess": "已取消",
-          "reBroadcastSuccess": "已重新广播"
-        },
-        "CancelTxPopup": {
-          "title": "取消交易",
-          "options": {
-            "quickCancel": {
-              "title": "快捷取消",
-              "desc": "不需要发起链上取消，不需要Gasfee",
-              "tips": "不是等待广播的交易，不支持快捷取消"
-            },
-            "onChainCancel": {
-              "title": "链上取消",
-              "desc": "发起新的链上交易来取消，需要Gasfee"
-            }
-          }
-        },
-        "SkipNonceAlert": {
-          "alert": "当前 {{chainName}} 链因快捷取消导致 Nonce#{{nonce}} 被跳过, 导致后续 Pending 交易无法完成, 可 <5></5><6>发起一笔链上交易</6><7></7>来填充"
         }
       },
       "title": "签名记录"
@@ -888,11 +809,7 @@
       "seed-phrase-delete-title": "删除助记词？",
       "update-balance-data": "刷新所有余额",
       "watch-address": "观察地址",
-      "whitelisted-address": "白名单地址",
-      "sort-by-balance": "按地址金额排序",
-      "sort-by-address-type": "按地址类型排序",
-      "sort-by-address-note": "按地址备注排序",
-      "sort-address": "地址排序"
+      "whitelisted-address": "白名单地址"
     },
     "receive": {
       "title": "在 {{chain}} 上接收{{token}}",
@@ -1061,8 +978,6 @@
       "ignoreAll": "忽略所有",
       "ledgerConnected": "Ledger 已连接",
       "ledgerNotConnected": "Ledger 未连接",
-      "keystoneNotConnected": "Keystone 未连接",
-      "keystoneConnected": "Keystone 已连接",
       "processRiskAlert": "请先处理所有警报",
       "requestFrom": "请求来源",
       "signAndSubmitButton": "签名并提交",
@@ -1108,18 +1023,6 @@
         "signWith": "使用 {{brand}} 签名",
         "txFailed": "交易失败",
         "unknownQRCode": "错误：无法识别二维码"
-      },
-      "keystone": {
-        "signWith": "切换到{{method}}进行签名",
-        "misMatchSignId": "交易数据不一致。请检查交易详情。",
-        "unsupportedType": "错误：交易类型不支持或未知。",
-        "siging": "正在发送签名请求",
-        "txRejected": "交易被拒绝",
-        "shouldRetry": "发生了某些错误。请重试。",
-        "hardwareRejectError": "硬件拒绝了签名请求",
-        "mismatchedWalletError": "钱包不匹配",
-        "verifyPasswordError": "签名失败，请解锁后重试",
-        "shouldOpenKeystoneHomePageError": "请打开 Keystone 主页"
       },
       "resend": "重试",
       "submitTx": "提交",
@@ -1176,7 +1079,6 @@
       "eip1559Desc2": "在 Rabby 中，Priority Fee（小费）= Max Fee - Base Fee。\n设置 Max Priority Fee 后，将从中扣除 Base Fee，剩下的部分将作为小费给予矿工",
       "enoughSafeSigCollected": "已收集到足够的签名",
       "failToFetchGasCost": "获取矿工费失败",
-      "importedAddress": "已导入地址",
       "fakeTokenAlert": "这是由 Rabby 标记的诈骗代币",
       "firstOnChain": "首次链上交易",
       "floorPrice": "地板价",
@@ -1263,10 +1165,9 @@
         "nftNotSupport": "不支持 NFT",
         "title": "发送 NFT"
       },
-      "sigCantDecode": "该签名无法被 Rabby 解码",
+      "sigCantDecode": "该签名无法被 Rabby 解码，但这并不意味着有任何风险",
       "signTransactionOnChain": "签署 {{chain}} 交易",
       "speedUpTooltip": "本次加速交易和原交易，最终只会完成其中一项",
-      "decodedTooltip": "该签名已被 Rabby Wallet 解析",
       "submitMultisig": {
         "multisigAddress": "多签地址",
         "title": "提交多签交易"
@@ -1275,7 +1176,6 @@
         "failLoadReceiveToken": "加载失败",
         "minReceive": "最少收到",
         "notPaymentAddress": "非当前付款地址",
-        "unknownAddress": "未知地址",
         "payToken": "卖出",
         "receiveToken": "买入",
         "receiver": "接收地址",
@@ -1304,47 +1204,14 @@
       "transacted": "之前交易过",
       "trustValue": "信任值",
       "trusted": "信任",
-      "unknownAction": "未知签名类型",
+      "unknownAction": "未知",
       "unknownActionType": "未知的动作类型",
       "unwrap": "Unwrap",
       "viewRaw": "查看原始数据",
       "wrapToken": "Wrap 代币",
       "contractPopularity": "No.{{0}} on {{1}}",
       "myMarkWithContract": "My mark on {{chainName}} contract",
-      "coboSafeNotPermission": "This delegate address does not have permission to initiate this transaction",
-      "l2GasEstimateTooltip": "该L2链的交易Gas预估值不包括L1的验证费用，实际的Gas消耗比当前预估值要多",
-      "BroadcastMode": {
-        "instant": {
-          "title": "立即广播",
-          "desc": "交易创建后将被立即广播到链上节点"
-        },
-        "lowGas": {
-          "title": "省 Gas 广播",
-          "desc": "交易创建后会等链上Gas较低的时广播从而节省Gas"
-        },
-        "mev": {
-          "title": "MEV 广播",
-          "desc": "交易创建后会被广播到指定MEV节点"
-        },
-        "tips": {
-          "notSupportChain": "当前链不支持该模式",
-          "customRPC": "使用自定义RPC时不支持该模式",
-          "walletConnect": "Wallet Connect 签名不支持该模式",
-          "notSupported": "不支持该模式"
-        },
-        "lowGasDeadline": {
-          "label": "最长等待时间"
-        }
-      },
-      "SafeNonceSelector": {
-        "optionGroup": {
-          "recommendTitle": "推荐的Nonce",
-          "replaceTitle": "替换Queue中的交易"
-        },
-        "error": {
-          "pendingList": "Pending列表获取失败, <1/><2>重试</2>"
-        }
-      }
+      "coboSafeNotPermission": "This delegate address does not have permission to initiate this transaction"
     },
     "signTypedData": {
       "buyNFT": {
@@ -1424,8 +1291,6 @@
       "pendingTip": "交易已提交。\n如果交易长时间处于待完成状态，你可以尝试点击“更多”>“清除待完成”",
       "price-expired-refresh-quote": "价格已过期，\n刷新报价",
       "rabby-fee": "Rabby手续费",
-      "preferMEV": "优先 MEV 模式",
-      "preferMEVTip": "开启后你在 Ethereum 链上的 Swap 交易将优先使用 Mev Guard 模式，这有助于减少你的交易被夹的风险。当你使用自定义 RPC 或者手机钱包地址时，则不支持该模式。",
       "rate": "汇率",
       "rates-from-cex": "来自 CEX 的汇率",
       "recommend-slippage": "为了防止被抢先交易，我们建议滑点为 <2>{{ slippage }}</2>%",
@@ -1440,8 +1305,7 @@
       "swap-history": "兑换历史",
       "swap-via-x": "通过 {{name}} 兑换",
       "testnet-is-not-supported": "不支持测试网",
-      "the-following-swap-rates-are-found": "发现以下兑换报价",
-      "sort-with-gas": "排序考虑gas",
+      "the-following-swap-rates-are-found": "发现以下报价",
       "there-is-no-fee-and-slippage-for-this-trade": "此交易不收取任何费用和滑点",
       "this-exchange-is-not-enabled-to-trade-by-you": "你未启用该交易所进行交易",
       "this-token-pair-is-not-supported": "不支持该代币对",
@@ -1549,16 +1413,7 @@
       "action": {
         "send": "发送"
       },
-      "viewBtn": "查看",
-      "replaceBtn": "替换",
-      "ReplacePopup": {
-        "title": "请选择替换交易的方式",
-        "desc": "已经签名的交易无法被清除，但是可以通过发起一笔相同 Nonce的交易来替换。",
-        "options": {
-          "send": "发送代币",
-          "reject": "拒绝交易"
-        }
-      }
+      "viewBtn": "查看"
     },
     "importSuccess": {
       "title": "成功导入",
@@ -1645,9 +1500,7 @@
       "gridPlusConnected": "GridPlus 已连接",
       "gridPlusNotConnected": "GridPlus 未连接",
       "ledgerNotConnected": "Ledger 未连接",
-      "ledgerConnected": "Ledger 已连接",
-      "keystoneConnected": "Keystone 已连接",
-      "keystoneNotConnected": "Keystone 未连接"
+      "ledgerConnected": "Ledger 已连接"
     },
     "Contact": {
       "AddressItem": {
@@ -1770,9 +1623,7 @@
       "submitted": "交易已提交",
       "more": "点击查看更多信息",
       "failed": "交易失败",
-      "completed": "交易已完成",
-      "txCompleteMoreContent": "{{chain}} #{{nonce}} 交易已完成，点击查看更多",
-      "txFailedMoreContent": "{{chain}} #{{nonce}} 交易失败，点击查看更多"
+      "completed": "交易已完成"
     },
     "alias": {
       "HdKeyring": "助记词",

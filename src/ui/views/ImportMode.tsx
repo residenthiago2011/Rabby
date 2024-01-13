@@ -70,7 +70,12 @@ const ImportMode = () => {
       hasDivider
       noPadding
     >
-      <header className="create-new-header create-password-header h-[234px] dark:bg-r-blue-disable">
+      <header className="create-new-header create-password-header h-[234px]">
+        <img
+          className="rabby-logo"
+          src="/images/logo-white.svg"
+          alt="rabby logo"
+        />
         <img
           className="unlock-logo w-[128px] h-[128px] mx-auto"
           src={ImportIcon}

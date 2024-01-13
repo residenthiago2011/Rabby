@@ -51,7 +51,7 @@ const TokenListWrapper = styled.div`
     .td {
       font-size: 12px;
       line-height: 14px;
-      color: var(--r-neutral-foot, #6a7587);
+      color: #707280;
       text-align: left;
       width: 120px;
       margin-bottom: 12px;
@@ -68,7 +68,7 @@ const TokenListWrapper = styled.div`
       width: 120px;
       font-size: 13px;
       line-height: 15px;
-      color: var(--r-neutral-title-1, #192945);
+      color: #13141a;
       text-align: left;
       &:nth-last-child(1) {
         text-align: right;
@@ -237,10 +237,10 @@ const SupplementsWrapper = styled.div`
     font-size: 12px;
     line-height: 14px;
     .label {
-      color: var(--r-neutral-body, #babec5);
+      color: #6f7280;
     }
     .content {
-      color: var(--r-neutral-title-1, #192945);
+      color: #4a4d59;
       margin-left: 4px;
     }
   }

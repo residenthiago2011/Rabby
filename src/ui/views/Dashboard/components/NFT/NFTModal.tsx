@@ -6,11 +6,9 @@ import { getChain } from '@/utils';
 import NFTAvatar from './NFTAvatar';
 import { openInTab, splitNumberByStep, useCommonPopupView } from '@/ui/utils';
 import { IGAEventSource } from '@/ui/utils/ga-event';
-import { ReactComponent as RcLinkSVG } from '@/ui/assets/nft-view/link.svg';
+import { ReactComponent as LinkSVG } from '@/ui/assets/nft-view/link.svg';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { openNFTLinkFromChainItem } from '@/ui/views/ApprovalManagePage/utils';
-import { findChainByServerID } from '@/utils/chain';
 
 interface ContentProps {
   data?: NFTItem;
@@ -51,10 +49,7 @@ const NFTModal = ({ onClose, data, collectionName }: ContentProps) => {
   };
 
   const onDetail = () => {
-    if (!data) return;
-    const chainItem = findChainByServerID(data?.chain);
-
-    openNFTLinkFromChainItem(chainItem, data.contract_id, true);
+    if (data) openInTab(data.detail_url);
   };
 
   return (
@@ -71,7 +66,7 @@ const NFTModal = ({ onClose, data, collectionName }: ContentProps) => {
           className="cursor-pointer hover:opacity-60 ml-4"
           onClick={onDetail}
         >
-          <RcLinkSVG />
+          <LinkSVG />
         </div>
       </div>
 

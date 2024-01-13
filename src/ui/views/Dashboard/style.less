@@ -270,13 +270,13 @@
         .amount {
           font-size: 32px;
           font-weight: bold;
-          padding: 0px 10px;
+          padding: 0px 20px;
           margin-top: 8px;
           display: flex;
           align-items: flex-end;
           gap: 8px;
           white-space: nowrap;
-          width: fit-content;
+          width: 280px;
           cursor: pointer;
 
           .amount-number {
@@ -1073,7 +1073,7 @@
   }
 }
 .dashboard-name {
-  max-width: 120px;
+  max-width: 130px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1404,7 +1404,7 @@
 }
 .first-notice {
   .ant-modal-header {
-    background: var(--r-neutral-bg-1);
+    background: #ffffff;
     text-align: left;
     border-bottom: 0;
   }
@@ -1413,17 +1413,13 @@
     font-weight: 500;
     font-size: 20px;
     line-height: 23px;
-    color: var(--r-neutral-title-1);
+    color: @color-title;
     text-align: left;
   }
   .ant-modal-content {
-    background: var(--r-neutral-bg-1);
-    color: var(--r-neutral-title-1);
+    background-color: #fff;
     .ant-modal-body {
       max-height: 420px;
-      h2 {
-        color: var(--r-neutral-title-1);
-      }
       li {
         padding-left: 10px;
         position: relative;
@@ -1432,7 +1428,7 @@
           position: absolute;
           width: 4px;
           height: 4px;
-          background-color: var(--r-neutral-title-1);
+          background-color: #000;
           border-radius: 100%;
           left: 0;
           top: 9px;

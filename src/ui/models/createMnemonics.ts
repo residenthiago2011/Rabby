@@ -7,7 +7,7 @@ import { RabbyRootState } from '../store';
 interface IState {
   mnemonics: string;
 
-  step: 'risk-check' | 'display';
+  step: 'risk-check' | 'display' | 'verify';
 }
 
 export const createMnemonics = createModel<RootModel>()({

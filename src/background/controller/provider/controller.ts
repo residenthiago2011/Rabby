@@ -27,12 +27,12 @@ import {
   pageStateCacheService,
   signTextHistoryService,
   RPCService,
+  i18n,
   swapService,
-  transactionBroadcastWatchService,
-  notificationService,
 } from 'background/service';
+import { notification } from 'background/webapi';
 import { Session } from 'background/service/session';
-import { Tx, TxPushType } from 'background/service/openapi';
+import { Tx } from 'background/service/openapi';
 import RpcCache from 'background/utils/rpcCache';
 import Wallet from '../wallet';
 import {
@@ -49,11 +49,10 @@ import { Account } from 'background/service/preference';
 import { validateGasPriceRange, is1559Tx } from '@/utils/transaction';
 import stats from '@/stats';
 import BigNumber from 'bignumber.js';
-import { AddEthereumChainParams } from '@/ui/views/Approval/components/AddChain/type';
+import { AddEthereumChainParams } from 'ui/views/Approval/components/AddChain';
 import { formatTxMetaForRpcResult } from 'background/utils/tx';
 import { findChainByEnum } from '@/utils/chain';
 import eventBus from '@/eventBus';
-import { StatsData } from '../../service/notification';
 
 const reportSignText = (params: {
   method: string;
@@ -92,9 +91,6 @@ interface ApprovalRes extends Tx {
   traceId?: string;
   $ctx?: any;
   signingTxId?: string;
-  pushType?: TxPushType;
-  lowGasDeadline?: number;
-  reqId?: string;
 }
 
 interface Web3WalletPermission {
@@ -335,17 +331,13 @@ class ProviderController extends BaseController {
     const isSend = !!txParams.isSend;
     const isSpeedUp = !!txParams.isSpeedUp;
     const isCancel = !!txParams.isCancel;
+    const traceId = approvalRes.traceId;
     const extra = approvalRes.extra;
     const signingTxId = approvalRes.signingTxId;
     const isCoboSafe = !!txParams.isCoboSafe;
-    const pushType = approvalRes.pushType || 'default';
-    const lowGasDeadline = approvalRes.lowGasDeadline;
-    const preReqId = approvalRes.reqId;
 
     let signedTransactionSuccess = false;
     delete txParams.isSend;
-    delete txParams.isSwap;
-    delete txParams.swapPreferMEVGuarded;
     delete approvalRes.isSend;
     delete approvalRes.isSwap;
     delete approvalRes.address;
@@ -355,9 +347,6 @@ class ProviderController extends BaseController {
     delete approvalRes.extra;
     delete approvalRes.$ctx;
     delete approvalRes.signingTxId;
-    delete approvalRes.pushType;
-    delete approvalRes.lowGasDeadline;
-    delete approvalRes.reqId;
     delete txParams.isCoboSafe;
 
     let is1559 = is1559Tx(approvalRes);
@@ -424,23 +413,6 @@ class ProviderController extends BaseController {
     ) {
       await new Promise((r) => setTimeout(r, 200));
     }
-    const statsData: StatsData = {
-      signed: false,
-      signedSuccess: false,
-      submit: false,
-      submitSuccess: false,
-      type: currentAccount.brandName,
-      chainId: chainItem?.serverId || '',
-      category: KEYRING_CATEGORY_MAP[currentAccount.type],
-      preExecSuccess: cacheExplain
-        ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
-        : true,
-      createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
-      source: options?.data?.$ctx?.ga?.source || '',
-      trigger: options?.data?.$ctx?.ga?.trigger || '',
-      reported: false,
-    };
-
     try {
       const signedTx = await keyringService.signTransaction(
         keyring,
@@ -453,17 +425,21 @@ class ProviderController extends BaseController {
         currentAccount.type === KEYRING_TYPE.CoboArgusKeyring
       ) {
         signedTransactionSuccess = true;
-        statsData.signed = true;
-        statsData.signedSuccess = true;
+        stats.report('signedTransaction', {
+          type: currentAccount.brandName,
+          chainId: chainItem?.serverId || '',
+          category: KEYRING_CATEGORY_MAP[currentAccount.type],
+          success: true,
+          preExecSuccess: cacheExplain
+            ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
+            : true,
+          createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
+          source: options?.data?.$ctx?.ga?.source || '',
+          trigger: options?.data?.$ctx?.ga?.trigger || '',
+        });
         return;
       }
-
-      const onTransactionCreated = (info: {
-        hash?: string;
-        reqId?: string;
-        pushType?: TxPushType;
-      }) => {
-        const { hash, reqId, pushType = 'default' } = info;
+      const onTransactionSubmitted = (hash: string) => {
         if (
           options?.data?.$ctx?.stats?.afterSign?.length &&
           Array.isArray(options?.data?.$ctx?.stats?.afterSign)
@@ -476,18 +452,25 @@ class ProviderController extends BaseController {
         }
 
         const { r, s, v, ...other } = approvalRes;
+        swapService.postSwap(chain, hash, other);
 
-        if (hash) {
-          swapService.postSwap(chain, hash, other);
-        }
-
-        statsData.submit = true;
-        statsData.submitSuccess = true;
+        stats.report('submitTransaction', {
+          type: currentAccount.brandName,
+          chainId: chainItem?.serverId || '',
+          category: KEYRING_CATEGORY_MAP[currentAccount.type],
+          success: true,
+          preExecSuccess: cacheExplain
+            ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
+            : true,
+          createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
+          source: options?.data?.$ctx?.ga?.source || '',
+          trigger: options?.data?.$ctx?.ga?.trigger || '',
+        });
         if (isSend) {
           pageStateCacheService.clear();
         }
-        transactionHistoryService.addTx({
-          tx: {
+        transactionHistoryService.addTx(
+          {
             rawTx: {
               ...rawTx,
               ...approvalRes,
@@ -499,101 +482,28 @@ class ProviderController extends BaseController {
             isCompleted: false,
             hash,
             failed: false,
-            reqId,
-            pushType,
           },
-          explain: cacheExplain,
-          actionData: action,
+          cacheExplain,
+          action,
           origin,
-          $ctx: options?.data?.$ctx,
-          isDropFailed: true,
-        });
+          options?.data?.$ctx
+        );
         transactionHistoryService.removeSigningTx(signingTxId!);
-        if (hash) {
-          transactionWatchService.addTx(
-            `${txParams.from}_${approvalRes.nonce}_${chain}`,
-            {
-              nonce: approvalRes.nonce,
-              hash,
-              chain,
-            }
-          );
-        }
-        if (reqId && !hash) {
-          transactionBroadcastWatchService.addTx(reqId, {
-            reqId,
-            address: txParams.from,
-            chainId: CHAINS[chain].id,
+        transactionWatchService.addTx(
+          `${txParams.from}_${approvalRes.nonce}_${chain}`,
+          {
             nonce: approvalRes.nonce,
-          });
-        }
+            hash,
+            chain,
+          }
+        );
 
         if (isCoboSafe) {
           preferenceService.resetCurrentCoboSafeAddress();
         }
       };
-      const onTransactionSubmitFailed = (e: any) => {
-        if (
-          options?.data?.$ctx?.stats?.afterSign?.length &&
-          Array.isArray(options?.data?.$ctx?.stats?.afterSign)
-        ) {
-          options.data.$ctx.stats.afterSign.forEach(({ name, params }) => {
-            if (name && params) {
-              stats.report(name, params);
-            }
-          });
-        }
-
-        stats.report('submitTransaction', {
-          type: currentAccount.brandName,
-          chainId: chainItem?.serverId || '',
-          category: KEYRING_CATEGORY_MAP[currentAccount.type],
-          success: false,
-          preExecSuccess: cacheExplain
-            ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
-            : true,
-          createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
-          source: options?.data?.$ctx?.ga?.source || '',
-          trigger: options?.data?.$ctx?.ga?.trigger || '',
-        });
-        if (!isSpeedUp && !isCancel) {
-          transactionHistoryService.addSubmitFailedTransaction(
-            {
-              rawTx: approvalRes,
-              createdAt: Date.now(),
-              isCompleted: true,
-              hash: '',
-              failed: false,
-              isSubmitFailed: true,
-            },
-            cacheExplain,
-            origin
-          );
-        }
-        const errMsg = e.message || JSON.stringify(e);
-        if (notificationService.statsData?.signMethod) {
-          statsData.signMethod = notificationService.statsData?.signMethod;
-        }
-        notificationService.setStatsData(statsData);
-        throw new Error(errMsg);
-      };
-
       if (typeof signedTx === 'string') {
-        onTransactionCreated({
-          hash: signedTx,
-          pushType: 'default',
-        });
-        if (
-          currentAccount.type === KEYRING_TYPE.WalletConnectKeyring ||
-          currentAccount.type === KEYRING_TYPE.CoinbaseKeyring
-        ) {
-          statsData.signed = true;
-          statsData.signedSuccess = true;
-        }
-        if (notificationService.statsData?.signMethod) {
-          statsData.signMethod = notificationService.statsData?.signMethod;
-        }
-        notificationService.setStatsData(statsData);
+        onTransactionSubmitted(signedTx);
         return signedTx;
       }
 
@@ -620,15 +530,24 @@ class ProviderController extends BaseController {
         }
       }
       signedTransactionSuccess = true;
-      statsData.signed = true;
-      statsData.signedSuccess = true;
+      stats.report('signedTransaction', {
+        type: currentAccount.brandName,
+        chainId: chainItem?.serverId || '',
+        category: KEYRING_CATEGORY_MAP[currentAccount.type],
+        success: true,
+        preExecSuccess: cacheExplain
+          ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
+          : true,
+        createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
+        source: options?.data?.$ctx?.ga?.source || '',
+        trigger: options?.data?.$ctx?.ga?.trigger || '',
+      });
       eventBus.emit(EVENTS.broadcastToUI, {
         method: EVENTS.TX_SUBMITTING,
       });
       try {
         validateGasPriceRange(approvalRes);
-        let hash: string | undefined = undefined;
-        let reqId: string | undefined = undefined;
+        let hash = '';
         if (RPCService.hasCustomRPC(chain)) {
           const txData: any = {
             ...approvalRes,
@@ -647,50 +566,98 @@ class ProviderController extends BaseController {
             'eth_sendRawTransaction',
             [rawTx]
           );
-
-          onTransactionCreated({ hash, reqId, pushType });
+          try {
+            openapiService.traceTx(
+              hash,
+              traceId || '',
+              chainItem?.serverId || ''
+            );
+          } catch (e) {
+            // DO nothing
+          }
         } else {
-          const res = await openapiService.submitTx({
-            tx: {
+          hash = await openapiService.pushTx(
+            {
               ...approvalRes,
               r: bufferToHex(signedTx.r),
               s: bufferToHex(signedTx.s),
               v: bufferToHex(signedTx.v),
               value: approvalRes.value || '0x0',
             },
-            push_type: pushType,
-            low_gas_deadline: lowGasDeadline,
-            req_id: preReqId || '',
-            origin,
-          });
-          hash = res.req.tx_id || undefined;
-          reqId = res.req.id || undefined;
-          if (res.req.push_status === 'failed') {
-            onTransactionSubmitFailed(new Error('Submit tx failed'));
-          } else {
-            onTransactionCreated({ hash, reqId, pushType });
-            if (notificationService.statsData?.signMethod) {
-              statsData.signMethod = notificationService.statsData?.signMethod;
-            }
-            notificationService.setStatsData(statsData);
-          }
+            traceId
+          );
         }
-
+        onTransactionSubmitted(hash);
         return hash;
       } catch (e: any) {
-        console.log('submit tx failed', e);
-        onTransactionSubmitFailed(e);
+        if (
+          options?.data?.$ctx?.stats?.afterSign?.length &&
+          Array.isArray(options?.data?.$ctx?.stats?.afterSign)
+        ) {
+          options.data.$ctx.stats.afterSign.forEach(({ name, params }) => {
+            if (name && params) {
+              stats.report(name, params);
+            }
+          });
+        }
+
+        stats.report('submitTransaction', {
+          type: currentAccount.brandName,
+          chainId: chainItem?.serverId || '',
+          category: KEYRING_CATEGORY_MAP[currentAccount.type],
+          success: false,
+          preExecSuccess: cacheExplain
+            ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
+            : true,
+          createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
+          source: options?.data?.$ctx?.ga?.source || '',
+          trigger: options?.data?.$ctx?.ga?.trigger || '',
+        });
+        if (!isSpeedUp && !isCancel) {
+          // const cacheExplain = transactionHistoryService.getExplainCache({
+          //   address: txParams.from,
+          //   chainId: Number(approvalRes.chainId),
+          //   nonce: Number(approvalRes.nonce),
+          // });
+          transactionHistoryService.addSubmitFailedTransaction(
+            {
+              rawTx: approvalRes,
+              createdAt: Date.now(),
+              isCompleted: true,
+              hash: '',
+              failed: false,
+              isSubmitFailed: true,
+            },
+            cacheExplain,
+            origin
+          );
+        }
+        const errMsg = e.message || JSON.stringify(e);
+        // notification.create(
+        //   undefined,
+        //   i18n.t('background.error.txPushFailed'),
+        //   errMsg
+        // );
+        // transactionHistoryService.removeSigningTx(signingTxId!);
+        throw new Error(errMsg);
       }
     } catch (e) {
       if (!signedTransactionSuccess) {
-        statsData.signed = true;
-        statsData.signedSuccess = false;
+        stats.report('signedTransaction', {
+          type: currentAccount.brandName,
+          chainId: chainItem?.serverId || '',
+          category: KEYRING_CATEGORY_MAP[currentAccount.type],
+          success: false,
+          preExecSuccess: cacheExplain
+            ? cacheExplain.pre_exec.success && cacheExplain.calcSuccess
+            : true,
+          createBy: options?.data?.$ctx?.ga ? 'rabby' : 'dapp',
+          source: options?.data?.$ctx?.ga?.source || '',
+          trigger: options?.data?.$ctx?.ga?.trigger || '',
+        });
       }
-      if (notificationService.statsData?.signMethod) {
-        statsData.signMethod = notificationService.statsData?.signMethod;
-      }
-      notificationService.setStatsData(statsData);
-      throw typeof e === 'object' ? e : new Error(e);
+      // transactionHistoryService.removeSigningTx(signingTxId!);
+      throw new Error(e);
     }
   };
   @Reflect.metadata('SAFE', true)
@@ -991,9 +958,6 @@ class ProviderController extends BaseController {
       RPCService.setRPC(approvalRes.chain, approvalRes.rpcUrl);
     }
 
-    const connectSite = permissionService.getConnectedSite(origin);
-    const prev = connectSite ? CHAINS[connectSite?.chain] : undefined;
-
     permissionService.updateConnectSite(
       origin,
       {
@@ -1003,14 +967,7 @@ class ProviderController extends BaseController {
     );
 
     // rabby:chainChanged event must be sent before chainChanged event
-    sessionService.broadcastEvent(
-      'rabby:chainChanged',
-      {
-        ...chain,
-        prev,
-      },
-      origin
-    );
+    sessionService.broadcastEvent('rabby:chainChanged', chain, origin);
     sessionService.broadcastEvent(
       'chainChanged',
       {
@@ -1061,9 +1018,6 @@ class ProviderController extends BaseController {
       throw new Error('This chain is not supported by Rabby yet.');
     }
 
-    const connectSite = permissionService.getConnectedSite(origin);
-    const prev = connectSite ? CHAINS[connectSite?.chain] : undefined;
-
     permissionService.updateConnectSite(
       origin,
       {
@@ -1073,14 +1027,7 @@ class ProviderController extends BaseController {
     );
 
     // rabby:chainChanged event must be sent before chainChanged event
-    sessionService.broadcastEvent(
-      'rabby:chainChanged',
-      {
-        ...chain,
-        prev,
-      },
-      origin
-    );
+    sessionService.broadcastEvent('rabby:chainChanged', chain, origin);
     sessionService.broadcastEvent(
       'chainChanged',
       {
@@ -1224,22 +1171,6 @@ class ProviderController extends BaseController {
       ...req,
       data: { method: 'eth_getTransactionByHash', params: [hash] },
     });
-  };
-
-  @Reflect.metadata('APPROVAL', [
-    'ImportAddress',
-    ({ data }) => {
-      if (!data.params[0]) {
-        throw ethErrors.rpc.invalidParams('params is required but got []');
-      }
-      if (!data.params[0]?.chainId) {
-        throw ethErrors.rpc.invalidParams('chainId is required');
-      }
-    },
-    { height: 628 },
-  ])
-  walletImportAddress = async () => {
-    return null;
   };
 }
 

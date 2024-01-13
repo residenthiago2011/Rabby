@@ -5,39 +5,17 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 import { matomoRequestEvent } from '@/utils/matomo-request';
 import IconAlertRed from 'ui/assets/alert-red.svg';
-import IconQuene, {
-  ReactComponent as RcIconQuene,
-} from 'ui/assets/dashboard/quene.svg';
-import IconSecurity, {
-  ReactComponent as RcIconSecurity,
-} from 'ui/assets/dashboard/security.svg';
-import IconSendToken, {
-  ReactComponent as RcIconSendToken,
-} from 'ui/assets/dashboard/sendtoken.svg';
-import IconSwap, {
-  ReactComponent as RcIconSwap,
-} from 'ui/assets/dashboard/swap.svg';
-import IconReceive, {
-  ReactComponent as RcIconReceive,
-} from 'ui/assets/dashboard/receive.svg';
-import IconGasTopUp, {
-  ReactComponent as RcIconGasTopUp,
-} from 'ui/assets/dashboard/gas-top-up.svg';
-import IconNFT, {
-  ReactComponent as RcIconNFT,
-} from 'ui/assets/dashboard/nft.svg';
-import IconTransactions, {
-  ReactComponent as RcIconTransactions,
-} from 'ui/assets/dashboard/transactions.svg';
-import IconAddresses, {
-  ReactComponent as RcIconAddresses,
-} from 'ui/assets/dashboard/addresses.svg';
-import IconFeedback, {
-  ReactComponent as RcIconFeedback,
-} from 'ui/assets/dashboard/feedback.svg';
-import IconMoreSettings, {
-  ReactComponent as RcIconMoreSettings,
-} from 'ui/assets/dashboard/more-settings.svg';
+import IconQuene from 'ui/assets/dashboard/quene.svg';
+import IconSecurity from 'ui/assets/dashboard/security.svg';
+import IconSendToken from 'ui/assets/dashboard/sendtoken.png';
+import IconSwap from 'ui/assets/dashboard/swap.svg';
+import IconReceive from 'ui/assets/dashboard/receive.svg';
+import IconGasTopUp from 'ui/assets/dashboard/gas-top-up.svg';
+import IconNFT from 'ui/assets/dashboard/nft.svg';
+import IconTransactions from 'ui/assets/dashboard/transactions.png';
+import IconAddresses from 'ui/assets/dashboard/addresses.svg';
+import IconFeedback from 'ui/assets/dashboard/feedback.svg';
+import IconMoreSettings from 'ui/assets/dashboard/more-settings.svg';
 import IconDrawer from 'ui/assets/drawer.png';
 import {
   getCurrentConnectSite,
@@ -48,14 +26,13 @@ import { CurrentConnection } from '../CurrentConnection';
 import ChainSelectorModal from 'ui/component/ChainSelector/Modal';
 import { Settings } from '../index';
 import './style.less';
-import { CHAINS_ENUM, ThemeIconType } from '@/constant';
+import { CHAINS_ENUM } from '@/constant';
 import { useAsync } from 'react-use';
 import { useRabbySelector } from '@/ui/store';
 import FeedbackPopup from '../Feedback';
 import { GasPriceBar } from '../GasPriceBar';
 import { ClaimRabbyBadgeModal } from '../ClaimRabbyBadgeModal';
 import { useTranslation } from 'react-i18next';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 export default ({
   gnosisPendingCount,
@@ -171,7 +148,7 @@ export default ({
   }, [showDrawer]);
 
   type IPanelItem = {
-    icon: ThemeIconType;
+    icon: string;
     content: string;
     onClick: import('react').MouseEventHandler<HTMLElement>;
     badge?: number;
@@ -187,7 +164,7 @@ export default ({
 
   const panelItems = {
     swap: {
-      icon: RcIconSwap,
+      icon: IconSwap,
       eventKey: 'Swap',
       content: t('page.dashboard.home.panel.swap'),
       onClick: () => {
@@ -195,13 +172,13 @@ export default ({
       },
     } as IPanelItem,
     send: {
-      icon: RcIconSendToken,
+      icon: IconSendToken,
       eventKey: 'Send',
       content: t('page.dashboard.home.panel.send'),
       onClick: () => history.push('/send-token?rbisource=dashboard'),
     } as IPanelItem,
     receive: {
-      icon: RcIconReceive,
+      icon: IconReceive,
       eventKey: 'Receive',
       content: t('page.dashboard.home.panel.receive'),
       onClick: () => {
@@ -209,7 +186,7 @@ export default ({
       },
     } as IPanelItem,
     gasTopUp: {
-      icon: RcIconGasTopUp,
+      icon: IconGasTopUp,
       eventKey: 'Gas Top Up',
       content: t('page.dashboard.home.panel.gasTopUp'),
       onClick: () => {
@@ -217,7 +194,7 @@ export default ({
       },
     } as IPanelItem,
     queue: {
-      icon: RcIconQuene,
+      icon: IconQuene,
       eventKey: 'Queue',
       content: t('page.dashboard.home.panel.queue'),
       badge: gnosisPendingCount,
@@ -226,7 +203,7 @@ export default ({
       },
     } as IPanelItem,
     transactions: {
-      icon: RcIconTransactions,
+      icon: IconTransactions,
       eventKey: 'Transactions',
       content: t('page.dashboard.home.panel.transactions'),
       onClick: () => {
@@ -234,7 +211,7 @@ export default ({
       },
     } as IPanelItem,
     security: {
-      icon: RcIconSecurity,
+      icon: IconSecurity,
       eventKey: 'Approvals',
       content: t('page.dashboard.home.panel.approvals'),
       onClick: async (evt) => {
@@ -250,19 +227,19 @@ export default ({
       badgeAlert: approvalRiskAlert > 0,
     } as IPanelItem,
     feedback: {
-      icon: RcIconFeedback,
+      icon: IconFeedback,
       eventKey: 'Feedback',
       content: t('page.dashboard.home.panel.feedback'),
       onClick: showFeedbackModal,
     } as IPanelItem,
     more: {
-      icon: RcIconMoreSettings,
+      icon: IconMoreSettings,
       eventKey: 'More',
       content: t('page.dashboard.home.panel.more'),
       onClick: toggleShowMoreSettings,
     } as IPanelItem,
     address: {
-      icon: RcIconAddresses,
+      icon: IconAddresses,
       eventKey: 'Manage Address',
       content: t('page.dashboard.home.panel.manageAddress'),
       onClick: () => {
@@ -270,7 +247,7 @@ export default ({
       },
     } as IPanelItem,
     nft: {
-      icon: RcIconNFT,
+      icon: IconNFT,
       eventKey: 'NFT',
       content: t('page.dashboard.home.panel.nft'),
       onClick: () => {
@@ -334,7 +311,7 @@ export default ({
                 autoAdjustOverflow={false}
               >
                 <div key={index} className="disable-direction">
-                  <ThemeIcon src={item.icon} className="images" />
+                  <img src={item.icon} className="images" />
                   <div>{item.content} </div>
                 </div>
               </Tooltip>
@@ -352,7 +329,7 @@ export default ({
                 className="direction pointer"
               >
                 {item.showAlert && (
-                  <ThemeIcon src={IconAlertRed} className="icon icon-alert" />
+                  <img src={IconAlertRed} className="icon icon-alert" />
                 )}
                 {item.badge ? (
                   <Badge
@@ -360,7 +337,7 @@ export default ({
                     size="small"
                     className={item.badgeAlert ? 'alert' : ''}
                   >
-                    <ThemeIcon
+                    <img
                       src={item.icon}
                       className={[item.iconSpin && 'icon-spin', 'images']
                         .filter(Boolean)
@@ -368,7 +345,7 @@ export default ({
                     />
                   </Badge>
                 ) : (
-                  <ThemeIcon src={item.icon} className="images" />
+                  <img src={item.icon} className="images" />
                 )}
                 <div>{item.content} </div>
                 {item.commingSoonBadge && (

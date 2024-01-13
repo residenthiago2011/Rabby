@@ -47,7 +47,7 @@ export const TokenButton: React.FC<Props> = ({
         onClick={() => setVisible(true)}
         className={clsx(
           'rounded-[2px] py-6 px-8',
-          'text-12 bg-r-neutral-card-2 text-r-neutral-foot',
+          'text-12 bg-gray-bg text-black',
           'flex items-center',
           'gap-2',
           'hover:opacity-60'
@@ -65,10 +65,9 @@ export const TokenButton: React.FC<Props> = ({
         push={false}
         onClose={() => setVisible(false)}
         title={`${len} ${label}`}
-        isSupportDarkMode
       >
         {!hiddenSubTitle && (
-          <div className="text-r-neutral-foot text-13 mb-[30px] text-center -m-8">
+          <div className="text-black text-13 mb-[30px] text-center -m-8">
             {t('page.dashboard.assets.tokenButton.subTitle')}
           </div>
         )}
@@ -77,10 +76,10 @@ export const TokenButton: React.FC<Props> = ({
           EmptyComponent={
             <div className="space-y-24 text-13 text-center mt-[100px]">
               <EmptySVG className="w-[52px] h-[52px] m-auto" />
-              <div className="text-r-neutral-body">{description}</div>
+              <div className="text-gray-subTitle">{description}</div>
               <div
                 onClick={handleClickLink}
-                className="text-r-blue-default underline cursor-pointer"
+                className="text-blue-light underline cursor-pointer"
               >
                 {linkText}
               </div>

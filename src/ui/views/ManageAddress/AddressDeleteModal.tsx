@@ -10,9 +10,6 @@ import React, { useMemo } from 'react';
 import { IDisplayedAccountWithBalance } from 'ui/models/accountToDisplay';
 import { ReactComponent as IconDelete } from '@/ui/assets/address/red-delete.svg';
 import { useTranslation } from 'react-i18next';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
-import { useThemeMode } from '@/ui/hooks/usePreference';
-import { pickKeyringThemeIcon } from '@/utils/account';
 
 type DelectModalProps = {
   visible: boolean;
@@ -36,17 +33,13 @@ export const AddressDeleteModal = ({
     brandName,
     type,
   });
-  const { isDarkTheme } = useThemeMode();
 
   const addressTypeIcon = useMemo(
     () =>
       brandIcon ||
-      pickKeyringThemeIcon(type as any, isDarkTheme) ||
       KEYRING_ICONS[type] ||
-      pickKeyringThemeIcon(brandName as any, isDarkTheme) ||
-      WALLET_BRAND_CONTENT?.[brandName]?.maybeSvg ||
       WALLET_BRAND_CONTENT?.[brandName]?.image,
-    [type, brandName, brandIcon, isDarkTheme]
+    [type, brandName, brandIcon]
   );
   const renderBrand = useMemo(() => {
     if (brandName && WALLET_BRAND_CONTENT[brandName]) {
@@ -55,15 +48,15 @@ export const AddressDeleteModal = ({
       return BRAND_ALIAN_TYPE_TEXT[type];
     }
     return type;
-  }, [type, brandName]);
+  }, [brandName]);
 
   return (
     <Popup visible={visible} title={null} height={220} onClose={onClose}>
       <div className="flex items-center relative w-[48px] h-[48px] mx-auto">
-        <ThemeIcon src={addressTypeIcon} className="w-[48px] h-[48px]" />
+        <img src={addressTypeIcon} className="w-[48px] h-[48px]" />
         <IconDelete className="absolute -bottom-4 -right-4" />
       </div>
-      <div className="text-center mt-20 mb-[36px] text-r-neutral-title-1 text-20 font-medium">
+      <div className="text-center mt-20 mb-[36px] text-gray-title text-20 font-medium">
         {t('page.manageAddress.delete-title', {
           count,
           brand: renderBrand,

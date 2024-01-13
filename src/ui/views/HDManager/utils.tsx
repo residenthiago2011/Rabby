@@ -8,7 +8,6 @@ import * as Sentry from '@sentry/browser';
 import { KEYRING_CLASS } from '@/constant';
 import { useRabbyDispatch } from '@/ui/store';
 import { useTranslation } from 'react-i18next';
-import { isFunction } from 'lodash';
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -41,7 +40,7 @@ export const fetchAccountsInfo = async (
         }
       }
 
-      let chains: Account['chains'] = [];
+      let chains: Account['chains'];
       try {
         chains = await wallet.openapi.usedChainList(account.address);
       } catch (e) {
@@ -60,13 +59,11 @@ export const fetchAccountsInfo = async (
       }
 
       // find firstTxTime
-      if (isFunction(chains?.forEach)) {
-        chains?.forEach((chain: any) => {
-          if (chain.born_at) {
-            firstTxTime = Math.min(firstTxTime ?? Infinity, chain.born_at);
-          }
-        });
-      }
+      chains?.forEach((chain: any) => {
+        if (chain.born_at) {
+          firstTxTime = Math.min(firstTxTime ?? Infinity, chain.born_at);
+        }
+      });
 
       const accountInfo: Account = {
         ...account,

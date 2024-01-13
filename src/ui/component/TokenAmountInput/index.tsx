@@ -129,8 +129,6 @@ const TokenAmountInput = ({
     setChainServerId(chainId);
   }, [chainId]);
 
-  const valueNum = Number(value);
-
   return (
     <div className={clsx('token-amount-input', className)}>
       <div className="left" onClick={handleSelectToken}>
@@ -140,32 +138,23 @@ const TokenAmountInput = ({
         </span>
         <img src={IconArrowDown} className="icon icon-arrow-down" />
       </div>
-      <div
-        className={clsx(
-          'right relative flex flex-col items-end overflow-hidden',
-          !valueNum && 'items-center'
-        )}
-      >
+      <div className="right relative flex flex-col items-end overflow-hidden">
         <Input
           ref={tokenInputRef}
-          placeholder="0"
-          className={clsx(!valueNum && 'h-[100%]')}
           value={value}
           onChange={(e) => onChange && onChange(e.target.value)}
           title={value}
         />
         {inlinePrize && (
           <div
-            className={
-              'text-r-neutral-foot text-12 text-right max-w-full truncate'
-            }
+            className="text-gray-content text-12 text-right max-w-full truncate"
             title={splitNumberByStep(
-              ((valueNum || 0) * token.price || 0).toFixed(2)
+              ((Number(value) || 0) * token.price || 0).toFixed(2)
             )}
           >
-            {valueNum
+            {Number(value)
               ? `≈$${splitNumberByStep(
-                  ((valueNum || 0) * token.price || 0).toFixed(2)
+                  ((Number(value) || 0) * token.price || 0).toFixed(2)
                 )}`
               : ''}
           </div>

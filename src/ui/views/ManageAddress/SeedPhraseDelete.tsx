@@ -38,7 +38,6 @@ export const SeedPhraseDeleteModal = ({
       title={t('page.manageAddress.seed-phrase-delete-title')}
       height={emptyAddress ? 150 : 224}
       onClose={onClose}
-      isSupportDarkMode
     >
       <div className="flex flex-col ">
         {list.map((item, i) => {
@@ -53,7 +52,7 @@ export const SeedPhraseDeleteModal = ({
               onClick={() => {
                 onSubmit(item.deleteSeedPhrase);
               }}
-              className="bg-r-neutral-card-2 text-r-neutral-title-1 border border-transparent hover:border-blue-light hover:bg-blue-light hover:bg-opacity-20"
+              className="bg-gray-bg2 border border-transparent hover:border-blue-light hover:bg-blue-light hover:bg-opacity-20"
             >
               {item.title}
             </Field>

@@ -62,13 +62,13 @@ class ContactBook {
     if (this.store[key]) {
       this.store[key] = Object.assign({}, this.store[key], {
         name: data.name,
-        address: key,
+        address: data.address.toLowerCase(),
         isAlias: true,
       });
     } else {
       this.store[key] = {
         name: data.name,
-        address: key,
+        address: data.address.toLowerCase(),
         isAlias: true,
         isContact: false,
       };

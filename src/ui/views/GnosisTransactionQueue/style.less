@@ -17,7 +17,7 @@
     gap: 20px 10px;
     flex-wrap: wrap;
     &-container {
-      background-color: var(--r-neutral-bg-2, #f5f6fa);
+      background-color: #f5f6fa;
       position: sticky;
       top: 64px;
       padding-bottom: 20px;
@@ -29,7 +29,7 @@
       font-weight: 400;
       font-size: 13px;
       line-height: 14px;
-      color: var(--r-neutral-body);
+      color: #4b4d59;
       position: relative;
       cursor: pointer;
 
@@ -48,7 +48,7 @@
     }
   }
   .queue-item {
-    background-color: var(--r-neutral-card-1);
+    background-color: #fff;
     border-radius: 6px;
     padding: 12px;
     margin-bottom: 20px;
@@ -72,7 +72,7 @@
           font-weight: 500;
           font-size: 15px;
           line-height: 18px;
-          color: var(--r-neutral-title-1);
+          color: @color-title;
         }
         .icon-explain {
           width: 20px;
@@ -92,31 +92,17 @@
     }
     &__footer {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-top: 12px;
-
-      .ant-btn {
-        font-size: 13px;
-        border-radius: 4px;
+      justify-content: center;
+      margin-top: 20px;
+      .submit-btn {
+        width: 172px;
         height: 36px;
         padding: 0;
-      }
-      .ant-btn-primary[disabled],
-      .ant-btn-primary[disabled]:hover,
-      .ant-btn-primary[disabled]:focus,
-      .ant-btn-primary[disabled]:active {
-        background-color: rgba(112, 132, 255, 0.4);
-        border: none;
-        &:before {
-          display: none;
+        .ant-btn {
+          width: 172px;
+          height: 36px;
+          padding: 0;
         }
-      }
-
-      .submit-btn {
-        width: 204px;
-
         span {
           font-weight: 500;
           font-size: 13px;
@@ -124,30 +110,20 @@
           text-align: center;
         }
       }
-      .replace-btn {
-        width: 120px;
-        &:hover {
-          &::before {
-            display: none;
-          }
-          background-color: #8697ff1a !important;
-          box-shadow: none;
-        }
-      }
     }
     .tx-confirm {
-      background: var(--r-neutral-card-2);
+      background: @color-bg;
       border-radius: 4px;
       padding: 12px;
       .tx-confirm__head {
-        border-bottom: 1px solid var(--r-neutral-line);
+        border-bottom: 1px solid @color-border;
         padding-bottom: 8px;
-        color: var(--r-neutral-foot);
+        color: #707281;
         font-size: 12px;
         line-height: 14px;
         .number {
           font-weight: 500;
-          color: var(--r-neutral-title-1);
+          color: @color-title;
         }
       }
       .tx-confirm__list {
@@ -157,7 +133,7 @@
           display: flex;
           font-size: 13px;
           line-height: 15px;
-          color: var(--r-neutral-foot);
+          color: @color-comment-1;
           margin-bottom: 20px;
           align-items: center;
           &:nth-last-child(1) {
@@ -165,7 +141,7 @@
           }
           &.checked {
             font-weight: 500;
-            color: var(--r-neutral-body);
+            color: #4b4d59;
           }
           .icon-check {
             width: 16px;
@@ -200,7 +176,7 @@
     }
   }
   .queue-group {
-    background-color: var(--r-neutral-card-1);
+    background-color: #ffffff;
     border: 1px solid var(--r-blue-default, #7084ff);
     border-radius: 6px;
     margin-bottom: 20px;

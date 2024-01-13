@@ -19,8 +19,6 @@ import eventBus from '@/eventBus';
 import { matomoRequestEvent } from '@/utils/matomo-request';
 import { adjustV } from '@/ui/utils/gnosis';
 import { message } from 'antd';
-import { useThemeMode } from '@/ui/hooks/usePreference';
-import { pickKeyringThemeIcon } from '@/utils/account';
 
 interface ApprovalParams {
   address: string;
@@ -72,28 +70,22 @@ export const PrivatekeyWaiting = ({ params }: { params: ApprovalParams }) => {
     rejectApproval('user cancel');
   };
 
-  const { isDarkTheme } = useThemeMode();
-
   const brandContent = React.useMemo(() => {
     switch (type) {
       case KEYRING_CLASS.PRIVATE_KEY:
         return {
           name: 'Private Key',
-          icon:
-            pickKeyringThemeIcon(KEYRING_CLASS.PRIVATE_KEY, isDarkTheme) ||
-            KEYRING_ICONS[KEYRING_CLASS.PRIVATE_KEY],
+          icon: KEYRING_ICONS[KEYRING_CLASS.PRIVATE_KEY],
         };
       case KEYRING_CLASS.MNEMONIC:
         return {
           name: 'Seed Phrase',
-          icon:
-            pickKeyringThemeIcon(KEYRING_CLASS.MNEMONIC, isDarkTheme) ||
-            KEYRING_ICONS[KEYRING_CLASS.MNEMONIC],
+          icon: KEYRING_ICONS[KEYRING_CLASS.MNEMONIC],
         };
       default:
         break;
     }
-  }, [type, isDarkTheme]);
+  }, [type]);
 
   const init = async () => {
     const account = params.isGnosis

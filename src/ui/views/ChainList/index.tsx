@@ -65,16 +65,15 @@ const ChainList = () => {
 
   return (
     <div className="page-chain-list">
-      <PageHeader className="transparent-wrap" canBack={false} closeable fixed>
+      <PageHeader canBack={false} closeable fixed>
         {t('page.chainList.title', { count: list.length })}
       </PageHeader>
       <PillsSwitch
         value={selectedTab}
         onTabChange={onTabChange}
-        className="flex bg-r-neutral-line w-[228px] mx-[auto] my-[0] h-[32px] p-[2px] mb-[14px]"
+        className="flex bg-[#e2e6ec] w-[228px] mx-[auto] my-[0] h-[32px] p-[2px] mb-[14px]"
         itemClassname={clsx('w-[112px] py-[7px] text-[12px]')}
-        itemClassnameInActive={clsx('text-r-neutral-body')}
-        itemClassnameActive="bg-r-neutral-bg-1"
+        itemClassnameInActive={clsx('text-[#4B4d59]')}
         options={
           [
             {

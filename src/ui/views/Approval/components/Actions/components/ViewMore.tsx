@@ -33,7 +33,7 @@ const PopupContainer = styled.div`
   .title {
     font-size: 16px;
     line-height: 19px;
-    color: var(--r-neutral-title-1, #192945);
+    color: #333333;
     display: flex;
     margin-bottom: 14px;
     .value-address {
@@ -50,7 +50,7 @@ const PopupContainer = styled.div`
 
       &:nth-child(1) {
         max-width: 140px;
-        border-right: 0.5px solid var(--r-neutral-line);
+        border-right: 1px solid #ededed;
         flex-shrink: 0;
       }
     }

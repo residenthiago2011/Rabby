@@ -18,7 +18,6 @@ import { useAsync } from 'react-use';
 import AuthenticationModalPromise from '@/ui/component/AuthenticationModal';
 import i18n from '@/i18n';
 import { useTranslation } from 'react-i18next';
-import { useEnterPassphraseModal } from '@/ui/hooks/useEnterPassphraseModal';
 
 export type DisplayedAccount = IDisplayedAccountWithBalance & {
   hdPathBasePublicKey?: string;
@@ -101,9 +100,7 @@ const sortScore = [
   }
 );
 
-export const getWalletScore = (
-  s: TypeKeyringGroup[] | IDisplayedAccountWithBalance[]
-) => {
+const getWalletScore = (s: TypeKeyringGroup[]) => {
   return sortScore[s?.[0]?.brandName || s?.[0]?.type] || DEFAULT_SCORE;
 };
 
@@ -275,7 +272,6 @@ export const useBackUp = () => {
   const wallet = useWallet();
   const history = useHistory();
   const { t } = useTranslation();
-  const invokeEnterPassphrase = useEnterPassphraseModal('publickey');
 
   const handleBackup = useCallback(
     async (publicKey: string, index) => {
@@ -285,7 +281,6 @@ export const useBackUp = () => {
         title: t('page.manageAddress.backup-seed-phrase'),
 
         async onFinished() {
-          await invokeEnterPassphrase(publicKey);
           const data = await wallet.getMnemonicFromPublicKey(publicKey);
           history.replace({
             search: `?index=${index}`,

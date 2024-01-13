@@ -7,8 +7,8 @@ import {
 } from './AdvancedSettings';
 import { HDPathType } from './HDPathTypeButton';
 import { MainContainer } from './MainContainer';
-import { ReactComponent as RcSettingSVG } from 'ui/assets/setting-outline-cc.svg';
-import { ReactComponent as RcHardwareSVG } from 'ui/assets/import/hardware-cc.svg';
+import { ReactComponent as SettingSVG } from 'ui/assets/setting-outline.svg';
+import { ReactComponent as HardwareSVG } from 'ui/assets/import/hardware.svg';
 import { useWallet } from '@/ui/utils';
 import { Account } from './AccountList';
 import { HARDWARE_KEYRING_TYPES } from '@/constant';
@@ -134,6 +134,7 @@ export const GridPlusManager: React.FC = () => {
           'getAccounts',
           keyringId
         );
+        console.log(accounts);
         await Promise.all(
           accounts.map(async (account) =>
             wallet.removeAddress(account, GRIDPLUS_TYPE, undefined, true)
@@ -146,7 +147,7 @@ export const GridPlusManager: React.FC = () => {
       centered: true,
       closable: true,
       maskClosable: true,
-      className: 'hd-manager-switch-modal modal-support-darkmode',
+      className: 'hd-manager-switch-modal',
     });
   }, []);
 
@@ -154,13 +155,13 @@ export const GridPlusManager: React.FC = () => {
     <>
       <div className="toolbar">
         <div className="toolbar-item" onClick={openSwitchHD}>
-          <RcHardwareSVG className="icon text-r-neutral-title1" />
+          <HardwareSVG className="icon" />
           <span className="title">
             {t('page.newAddress.hd.gridplus.switchToAnotherGridplus')}
           </span>
         </div>
         <div className="toolbar-item" onClick={openAdvanced}>
-          <RcSettingSVG className="icon text-r-neutral-title1" />
+          <SettingSVG className="icon" />
           <span className="title">
             {t('page.newAddress.hd.advancedSettings')}
           </span>
@@ -171,7 +172,7 @@ export const GridPlusManager: React.FC = () => {
 
       <Modal
         destroyOnClose
-        className="AdvancedModal modal-support-darkmode"
+        className="AdvancedModal"
         title={t('page.newAddress.hd.customAddressHdPath')}
         visible={visibleAdvanced}
         centered

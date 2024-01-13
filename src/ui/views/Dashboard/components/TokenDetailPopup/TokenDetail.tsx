@@ -6,7 +6,7 @@ import { last } from 'lodash';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import { ReactComponent as RcIconExternal } from 'ui/assets/icon-share-currentcolor.svg';
+import IconExternal from 'ui/assets/icon-share.svg';
 import { Copy, TokenWithChain } from 'ui/component';
 import {
   splitNumberByStep,
@@ -27,8 +27,6 @@ import { SWAP_SUPPORT_CHAINS } from '@/constant';
 import { CustomizedButton } from './CustomizedButton';
 import { BlockedButton } from './BlockedButton';
 import { useRabbySelector } from '@/ui/store';
-import { TooltipWithMagnetArrow } from '@/ui/component/Tooltip/TooltipWithMagnetArrow';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 const PAGE_COUNT = 10;
 const ellipsis = (text: string) => {
@@ -132,7 +130,7 @@ const TokenDetail = ({
     if (!chain) return;
     const prefix = chain.scanLink?.replace('/tx/_s_', '');
     const needClose = getUITypeName() !== 'notification';
-    openInTab(`${prefix}/address/${token.id}`, needClose);
+    openInTab(`${prefix}/token/${token.id}`, needClose);
   };
 
   const isEmpty = (data?.list?.length || 0) <= 0 && !loading;
@@ -191,9 +189,10 @@ const TokenDetail = ({
             {isShowAddress ? (
               <>
                 {ellipsis(token.id)}
-                <ThemeIcon
-                  src={RcIconExternal}
+                <img
+                  src={IconExternal}
                   className="w-14 cursor-pointer"
+                  alt=""
                   onClick={() => {
                     handleClickLink(token);
                   }}
@@ -229,29 +228,25 @@ const TokenDetail = ({
             {getTokenSymbol(token)} {t('page.newAddress.hd.balance')}
           </div>
           <div className="balance-content overflow-hidden">
-            <TooltipWithMagnetArrow
-              className="rectangle w-[max-content]"
-              title={(tokenWithAmount.amount || 0).toString()}
-              placement="bottom"
+            <div
+              className="balance-value truncate"
+              title={splitNumberByStep(
+                (tokenWithAmount.amount || 0)?.toFixed(4)
+              )}
             >
-              <div className="balance-value truncate">
-                {splitNumberByStep((tokenWithAmount.amount || 0)?.toFixed(8))}
-              </div>
-            </TooltipWithMagnetArrow>
-            <TooltipWithMagnetArrow
-              title={`≈ $${(
-                tokenWithAmount.amount * token.price || 0
-              ).toString()}`}
-              className="rectangle w-[max-content]"
-              placement="bottom"
+              {splitNumberByStep((tokenWithAmount.amount || 0)?.toFixed(4))}
+            </div>
+            <div
+              className="balance-value-usd truncate"
+              title={splitNumberByStep(
+                (tokenWithAmount.amount * token.price || 0)?.toFixed(2)
+              )}
             >
-              <div className="balance-value-usd truncate">
-                ≈ $
-                {splitNumberByStep(
-                  (tokenWithAmount.amount * token.price || 0)?.toFixed(2)
-                )}
-              </div>
-            </TooltipWithMagnetArrow>
+              ≈ $
+              {splitNumberByStep(
+                (tokenWithAmount.amount * token.price || 0)?.toFixed(2)
+              )}
+            </div>
           </div>
         </div>
 

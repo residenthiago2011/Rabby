@@ -37,13 +37,8 @@ const SortHat = () => {
       !approval
     ) {
       const cache = (await wallet.getPageStateCache())!;
-      if (cache.path && cache.path !== '/') {
-        // prevent path is empty then extension will stuck
-        setTo(cache.path + (cache.search || ''));
-        return;
-      } else {
-        wallet.clearPageStateCache();
-      }
+      setTo(cache.path + (cache.search || ''));
+      return;
     }
 
     const currentAccount = await wallet.getCurrentAccount();

@@ -38,19 +38,10 @@ import {
   WrapTokenRequireData,
   getActionTypeText,
 } from './utils';
-import IconArrowRight, {
-  ReactComponent as RcIconArrowRight,
-} from 'ui/assets/approval/edit-arrow-right.svg';
+import IconArrowRight from 'ui/assets/approval/edit-arrow-right.svg';
 import IconSpeedUp from 'ui/assets/sign/tx/speedup.svg';
-import IconQuestionMark from 'ui/assets/sign/question-mark-24.svg';
-import IconRabbyDecoded from 'ui/assets/sign/rabby-decoded.svg';
-import IconCheck, {
-  ReactComponent as RcIconCheck,
-} from 'src/ui/assets/approval/icon-check.svg';
+import { ReactComponent as IconQuestionMark } from 'ui/assets/sign/tx/question-mark.svg';
 import { TooltipWithMagnetArrow } from '@/ui/component/Tooltip/TooltipWithMagnetArrow';
-import { NoActionAlert } from '../NoActionAlert/NoActionAlert';
-import clsx from 'clsx';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 export const SignTitle = styled.div`
   display: flex;
@@ -60,7 +51,7 @@ export const SignTitle = styled.div`
     display: flex;
     font-size: 18px;
     line-height: 21px;
-    color: var(--r-neutral-title-1, #f7fafc);
+    color: #333333;
     flex: 1;
     .icon-speedup {
       width: 10px;
@@ -77,13 +68,13 @@ export const SignTitle = styled.div`
 `;
 
 export const ActionWrapper = styled.div`
-  background-color: var(--r-neutral-bg-1, #fff);
+  background-color: #fff;
   border-radius: 8px;
   .action-header {
     display: flex;
     justify-content: space-between;
     background: var(--r-blue-default, #7084ff);
-    padding: 13px;
+    padding: 14px;
     align-items: center;
     color: #fff;
     border-top-left-radius: 8px;
@@ -96,39 +87,17 @@ export const ActionWrapper = styled.div`
     .right {
       font-size: 14px;
       line-height: 16px;
-      position: relative;
-      .decode-tooltip {
-        max-width: 358px;
-        &:not(.ant-tooltip-hidden) {
-          left: -321px !important;
-          .ant-tooltip-arrow {
-            left: 333px;
-          }
-        }
-        .ant-tooltip-arrow-content {
-          background-color: var(--r-neutral-bg-1, #fff);
-        }
-        .ant-tooltip-inner {
-          background-color: var(--r-neutral-bg-1, #fff);
-          padding: 0;
-          font-size: 13px;
-          font-weight: 500;
-          color: var(--r-neutral-body, #3e495e);
-          border-radius: 6px;
+      .icon-tip {
+        margin-top: 1px;
+        margin-left: 4px;
+        path {
+          stroke: #fff;
         }
       }
-    }
-    &.is-unknown {
-      background: var(--r-neutral-foot, #6a7587);
     }
   }
   .container {
     padding: 14px;
-    /* border: 0.5px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1)); */
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    background-color: var(--r-neutral-card-1, rgba(255, 255, 255, 0.06));
-
     .header {
       display: flex;
       justify-content: space-between;
@@ -198,49 +167,25 @@ const Actions = ({
           onClick={handleViewRawClick}
         >
           {t('page.signTx.viewRaw')}
-          <ThemeIcon className="icon icon-arrow-right" src={RcIconArrowRight} />
+          <img className="icon icon-arrow-right" src={IconArrowRight} />
         </div>
       </SignTitle>
       <ActionWrapper>
-        <div
-          className={clsx('action-header', {
-            'is-unknown': data.contractCall,
-          })}
-        >
+        <div className="action-header">
           <div className="left">{actionName}</div>
           <div className="right">
-            <TooltipWithMagnetArrow
-              placement="bottom"
-              overlayClassName="rectangle w-[max-content] decode-tooltip"
-              title={
-                data.contractCall ? (
-                  <NoActionAlert
-                    data={{
-                      chainId: chain.serverId,
-                      contractAddress:
-                        requireData && 'id' in requireData
-                          ? requireData.id
-                          : txDetail.type_call?.contract,
-                      selector: raw.data.toString(),
-                    }}
-                  />
-                ) : (
-                  <span className="flex w-[358px] p-12 items-center">
-                    <ThemeIcon src={RcIconCheck} className="mr-4 w-12" />
-                    {t('page.signTx.decodedTooltip')}
-                  </span>
-                )
-              }
-            >
-              {data.contractCall ? (
-                <img src={IconQuestionMark} className="w-24" />
-              ) : (
-                <img
-                  src={IconRabbyDecoded}
-                  className="icon icon-rabby-decoded"
-                />
-              )}
-            </TooltipWithMagnetArrow>
+            {data.contractCall && (
+              <span className="flex items-center relative">
+                {t('page.signTx.unknownActionType')}{' '}
+                <TooltipWithMagnetArrow
+                  overlayClassName="rectangle w-[max-content]"
+                  title={t('page.signTx.sigCantDecode')}
+                  placement="top"
+                >
+                  <IconQuestionMark className="icon icon-tip" />
+                </TooltipWithMagnetArrow>
+              </span>
+            )}
           </div>
         </div>
         <div className="container">

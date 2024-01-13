@@ -8,7 +8,7 @@ This extension has 3 kinds of UI pages.
 
 - `notification page`
 
-  When a Dapp requests user interaction, such as `sign` or `connect`, this page will show in a separate window.
+  When a Dapp requests user interaction, such as `sign` or `connect`, this page will show in a seperate window.
 
 - `tab page`
 

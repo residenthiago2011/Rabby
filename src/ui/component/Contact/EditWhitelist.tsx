@@ -13,7 +13,7 @@ const EditWhitelistWrapper = styled.div`
   top: 0;
   width: 100vw;
   height: 100vh;
-  background: var(--r-neutral-bg-1, #3d4251);
+  background: #fff;
   z-index: 100;
   padding: 0 12px 80px 20px;
   display: flex;
@@ -73,10 +73,10 @@ const EditWhitelist = ({
         className: 'page-receive-modal edit-whitelist-back-modal',
         content: (
           <div>
-            <h1 className="text-r-neutral-title1 text-center mb-12">
+            <h1 className="text-gray-title text-center mb-12">
               {t('component.Contact.EditWhitelist.backModalTitle')}
             </h1>
-            <p className="text-r-neutral-body text-center text-15 mb-[52px]">
+            <p className="text-gray-subTitle text-center text-15 mb-[52px]">
               {t('component.Contact.EditWhitelist.backModalContent')}
             </p>
             <div className="footer">
@@ -130,7 +130,7 @@ const EditWhitelist = ({
       <PageHeader onBack={handleClickBack}>
         {t('component.Contact.EditWhitelist.title')}
       </PageHeader>
-      <p className="text-r-neutral-body text-14 mb-20 text-center">
+      <p className="text-gray-content text-14 mb-20 text-center">
         {t('component.Contact.EditWhitelist.tip')}
       </p>
       <ListScrollWrapper>
@@ -140,7 +140,7 @@ const EditWhitelist = ({
               width="20px"
               height="20px"
               className="mr-12"
-              background="var(--r-green-default, #2ABB7F)"
+              background="#27C193"
               checked={
                 !!checkedList.find((item) =>
                   isSameAddress(account.address, item)

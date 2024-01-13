@@ -12,7 +12,7 @@ export const GridPlusAccount: React.FC = () => {
   const TipContent = () => {
     if (status === 'CONNECTED') {
       return (
-        <div className="text-r-neutral-body">
+        <div className="text-gray-subTitle">
           {t('page.signFooterBar.gridPlusConnected')}
         </div>
       );
@@ -24,7 +24,7 @@ export const GridPlusAccount: React.FC = () => {
         </div>
         <div
           onClick={onClickConnect}
-          className={clsx('cursor-pointer', 'text-13 text-r-neutral-body', {
+          className={clsx('cursor-pointer', 'text-13 text-black', {
             'opacity-60': connectLoading,
             underline: !connectLoading,
           })}

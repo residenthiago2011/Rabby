@@ -1,4 +1,4 @@
-import { Models, RematchDispatch, RematchRootState } from '@rematch/core';
+import { Models } from '@rematch/core';
 
 import { app } from './app';
 import { appVersion } from './appVersion';
@@ -60,6 +60,3 @@ export const models: RootModel = {
   securityEngine,
   sign,
 };
-
-export type RabbyDispatch = RematchDispatch<RootModel>;
-export type RabbyRootState = RematchRootState<RootModel>;

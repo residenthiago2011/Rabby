@@ -1,5 +1,5 @@
 import { Button, InputNumber } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { HDPathType, HDPathTypeButton } from './HDPathTypeButton';
 import { InitAccounts } from './LedgerManager';
 import { HDManagerStateContext } from './utils';
@@ -7,7 +7,6 @@ import { KEYRING_CLASS } from '@/constant';
 import { useWallet } from '@/ui/utils';
 import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
-import { useIsKeystoneUsbAvailable } from '@/utils/keystone';
 
 const MIN_START_NO = 1;
 const MAX_START_NO = 950 + MIN_START_NO;
@@ -23,65 +22,31 @@ export const DEFAULT_SETTING_DATA: SettingData = {
   startNo: MIN_START_NO,
 };
 
-const useHDPathTypeGroup = (brand?: string) => {
-  const [HDPathTypeGroup, setHDPathTypeGroup] = useState({
-    [KEYRING_CLASS.HARDWARE.LEDGER]: [
-      HDPathType.BIP44,
-      HDPathType.LedgerLive,
-      HDPathType.Legacy,
-    ],
-    [KEYRING_CLASS.HARDWARE.TREZOR]: [HDPathType.BIP44],
-    [KEYRING_CLASS.HARDWARE.ONEKEY]: [HDPathType.BIP44],
-    [KEYRING_CLASS.MNEMONIC]: [
-      HDPathType.BIP44,
-      HDPathType.LedgerLive,
-      HDPathType.Legacy,
-    ],
-    [KEYRING_CLASS.HARDWARE.GRIDPLUS]: [
-      HDPathType.LedgerLive,
-      HDPathType.BIP44,
-      HDPathType.Legacy,
-    ],
-    [KEYRING_CLASS.HARDWARE.KEYSTONE]: [HDPathType.BIP44],
-    [KEYRING_CLASS.HARDWARE.BITBOX02]: [HDPathType.BIP44],
-  });
-  const isAvaliable = useIsKeystoneUsbAvailable(brand);
-
-  useEffect(() => {
-    if (HDPathTypeGroup[KEYRING_CLASS.HARDWARE.KEYSTONE].length === 3) {
-      // If the Keystone hardware wallet has been previously connected via USB (indicated by having 3 types
-      // of connection paths), then there's no need to proceed further.
-      return;
-    }
-    if (isAvaliable) {
-      setHDPathTypeGroup((prev) => ({
-        ...prev,
-        [KEYRING_CLASS.HARDWARE.KEYSTONE]: [
-          HDPathType.BIP44,
-          HDPathType.LedgerLive,
-          HDPathType.Legacy,
-        ],
-      }));
-    } else {
-      setHDPathTypeGroup((prev) => ({
-        ...prev,
-        [KEYRING_CLASS.HARDWARE.KEYSTONE]: [HDPathType.BIP44],
-      }));
-    }
-  }, [isAvaliable]);
-
-  return HDPathTypeGroup;
+const HDPathTypeGroup = {
+  [KEYRING_CLASS.HARDWARE.LEDGER]: [
+    HDPathType.LedgerLive,
+    HDPathType.BIP44,
+    HDPathType.Legacy,
+  ],
+  [KEYRING_CLASS.HARDWARE.TREZOR]: [HDPathType.BIP44],
+  [KEYRING_CLASS.HARDWARE.ONEKEY]: [HDPathType.BIP44],
+  [KEYRING_CLASS.MNEMONIC]: [HDPathType.Default],
+  [KEYRING_CLASS.HARDWARE.GRIDPLUS]: [
+    HDPathType.LedgerLive,
+    HDPathType.BIP44,
+    HDPathType.Legacy,
+  ],
+  [KEYRING_CLASS.HARDWARE.KEYSTONE]: [HDPathType.BIP44],
+  [KEYRING_CLASS.HARDWARE.BITBOX02]: [HDPathType.BIP44],
 };
 
 interface Props {
   onConfirm?: (data: SettingData) => void;
   initAccounts?: InitAccounts;
   initSettingData?: SettingData;
-  brand?: string;
 }
 
 export const AdvancedSettings: React.FC<Props> = ({
-  brand,
   onConfirm,
   initAccounts,
   initSettingData,
@@ -102,11 +67,7 @@ export const AdvancedSettings: React.FC<Props> = ({
       [HDPathType.BIP44]: t('page.newAddress.hd.onekey.hdPathType.bip44'),
     },
     [KEYRING_CLASS.MNEMONIC]: {
-      [HDPathType.BIP44]: t('page.newAddress.hd.mnemonic.hdPathType.bip44'),
-      [HDPathType.LedgerLive]: t(
-        'page.newAddress.hd.mnemonic.hdPathType.ledgerLive'
-      ),
-      [HDPathType.Legacy]: t('page.newAddress.hd.mnemonic.hdPathType.legacy'),
+      [HDPathType.Default]: t('page.newAddress.hd.mnemonic.hdPathType.default'),
     },
     [KEYRING_CLASS.HARDWARE.GRIDPLUS]: {
       [HDPathType.LedgerLive]: t(
@@ -117,10 +78,6 @@ export const AdvancedSettings: React.FC<Props> = ({
     },
     [KEYRING_CLASS.HARDWARE.KEYSTONE]: {
       [HDPathType.BIP44]: t('page.newAddress.hd.keystone.hdPathType.bip44'),
-      [HDPathType.LedgerLive]: t(
-        'page.newAddress.hd.keystone.hdPathType.ledgerLive'
-      ),
-      [HDPathType.Legacy]: t('page.newAddress.hd.keystone.hdPathType.legacy'),
     },
     [KEYRING_CLASS.HARDWARE.BITBOX02]: {
       [HDPathType.BIP44]: t('page.newAddress.hd.bitbox02.hdPathType.bip44'),
@@ -150,11 +107,9 @@ export const AdvancedSettings: React.FC<Props> = ({
       ),
     },
     [KEYRING_CLASS.MNEMONIC]: {
-      [HDPathType.LedgerLive]: t(
-        'page.newAddress.hd.mnemonic.hdPathType.ledgerLive'
+      [HDPathType.Default]: t(
+        'page.newAddress.hd.mnemonic.hdPathTypeNoChain.default'
       ),
-      [HDPathType.BIP44]: t('page.newAddress.hd.mnemonic.hdPathType.bip44'),
-      [HDPathType.Legacy]: t('page.newAddress.hd.mnemonic.hdPathType.legacy'),
     },
     [KEYRING_CLASS.HARDWARE.GRIDPLUS]: {
       [HDPathType.LedgerLive]: t(
@@ -171,12 +126,6 @@ export const AdvancedSettings: React.FC<Props> = ({
       [HDPathType.BIP44]: t(
         'page.newAddress.hd.keystone.hdPathTypeNochain.bip44'
       ),
-      [HDPathType.LedgerLive]: t(
-        'page.newAddress.hd.keystone.hdPathTypeNochain.ledgerLive'
-      ),
-      [HDPathType.Legacy]: t(
-        'page.newAddress.hd.keystone.hdPathTypeNochain.legacy'
-      ),
     },
     [KEYRING_CLASS.HARDWARE.BITBOX02]: {
       [HDPathType.BIP44]: t(
@@ -190,7 +139,6 @@ export const AdvancedSettings: React.FC<Props> = ({
   const { keyring, keyringId } = React.useContext(HDManagerStateContext);
   const wallet = useWallet();
   const [disableStartFrom, setDisableStartFrom] = React.useState(false);
-  const HDPathTypeGroup = useHDPathTypeGroup(brand);
 
   const onInputChange = React.useCallback((value: number) => {
     if (isNaN(value) || value < DEFAULT_SETTING_DATA.startNo) {
@@ -218,18 +166,15 @@ export const AdvancedSettings: React.FC<Props> = ({
       });
   }, []);
 
-  const isAvailable = useIsKeystoneUsbAvailable(brand);
-
   const disabledSelectHDPath = React.useMemo(() => {
-    const hardwareKeyringTypes = [
-      KEYRING_CLASS.HARDWARE.TREZOR,
-      KEYRING_CLASS.HARDWARE.ONEKEY,
-      KEYRING_CLASS.HARDWARE.KEYSTONE,
-      KEYRING_CLASS.HARDWARE.BITBOX02,
-    ];
-
-    return !isAvailable && hardwareKeyringTypes.includes(keyring as any);
-  }, [keyring, isAvailable]);
+    return (
+      keyring === KEYRING_CLASS.HARDWARE.TREZOR ||
+      keyring === KEYRING_CLASS.HARDWARE.ONEKEY ||
+      keyring === KEYRING_CLASS.MNEMONIC ||
+      keyring === KEYRING_CLASS.HARDWARE.KEYSTONE ||
+      keyring === KEYRING_CLASS.HARDWARE.BITBOX02
+    );
+  }, [keyring]);
 
   const isOnChain = React.useCallback(
     (type) => {
@@ -256,7 +201,7 @@ export const AdvancedSettings: React.FC<Props> = ({
     return isOnChain(hdPathType)
       ? HDPathTypeTips[keyring][hdPathType]
       : HDPathTypeTipsNoChain[keyring][hdPathType];
-  }, [hdPathType, keyring, disabledSelectHDPath, HDPathTypeGroup]);
+  }, [hdPathType, keyring, disabledSelectHDPath]);
 
   const handleSubmit = () =>
     onConfirm?.({
@@ -264,27 +209,21 @@ export const AdvancedSettings: React.FC<Props> = ({
       startNo,
     });
 
-  const HDPathTypeGroupRender = React.useCallback(() => {
-    return (
-      <>
-        {HDPathTypeGroup[keyring].map((type) => (
-          <HDPathTypeButton
-            type={type}
-            onClick={setHDPathType}
-            isOnChain={isOnChain(type)}
-            selected={hdPathType === type}
-            key={type}
-          />
-        ))}
-      </>
-    );
-  }, [keyring, hdPathType, HDPathTypeGroup, isOnChain]);
-
   return (
-    <div className="AdvancedSettings widget-has-ant-input2">
+    <div className="AdvancedSettings">
       <div className="group">
         <div className="label">{t('page.newAddress.hd.selectHdPath')}</div>
-        <div className="group-field">{HDPathTypeGroupRender()}</div>
+        <div className="group-field">
+          {HDPathTypeGroup[keyring].map((type) => (
+            <HDPathTypeButton
+              type={type}
+              onClick={setHDPathType}
+              isOnChain={isOnChain(type)}
+              selected={hdPathType === type}
+              key={type}
+            />
+          ))}
+        </div>
         <div className="tip">{currentHdPathTypeTip}</div>
       </div>
       <div

@@ -86,7 +86,7 @@ const MultiSelectAddressList = ({
                 {account.index}
               </span>
               <span
-                className="text-15 font-medium text-r-neutral-title1"
+                className="text-15 font-medium text-gray-title"
                 title={account.address.toLowerCase()}
               >
                 {ellipsis(account.address.toLowerCase())}

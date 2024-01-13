@@ -1,14 +1,17 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Drawer, Button } from 'antd';
 import BN from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import FieldCheckbox from 'ui/component/FieldCheckbox';
 import AddressViewer from 'ui/component/AddressViewer';
 import { Account } from 'background/service/preference';
-import { pickKeyringThemeIcon } from '@/utils/account';
 import { useWallet, isSameAddress, formatTokenAmount } from 'ui/utils';
-import { useThemeMode } from '@/ui/hooks/usePreference';
-import { KEYRING_TYPE, WALLET_BRAND_CONTENT, CHAINS } from 'consts';
+import {
+  KEYRING_TYPE,
+  KEYRING_ICONS,
+  WALLET_BRAND_CONTENT,
+  CHAINS,
+} from 'consts';
 import './style.less';
 import { CommonSignal } from '../ConnectStatus/CommonSignal';
 import { useWalletConnectIcon } from '../WalletConnect/useWalletConnectIcon';
@@ -77,19 +80,6 @@ export const AccountItem = ({
 
   const brandIcon = useWalletConnectIcon(account);
 
-  const { isDarkTheme } = useThemeMode();
-
-  const addressTypeIcon = useMemo(() => {
-    const brandName = account.brandName;
-    return (
-      brandIcon ||
-      pickKeyringThemeIcon(brandName as any, {
-        needLightVersion: isDarkTheme,
-      }) ||
-      WALLET_BRAND_CONTENT?.[brandName]?.image
-    );
-  }, [account, brandIcon, isDarkTheme]);
-
   return (
     <FieldCheckbox
       className="item"
@@ -98,7 +88,15 @@ export const AccountItem = ({
       checked={checked}
     >
       <div className="icon icon-keyring relative">
-        <img width={24} height={24} src={addressTypeIcon} />
+        <img
+          width={24}
+          height={24}
+          src={
+            brandIcon ||
+            WALLET_BRAND_CONTENT[account.brandName]?.image ||
+            KEYRING_ICONS[account.type]
+          }
+        />
         <CommonSignal
           type={account.type}
           brandName={account.brandName}
@@ -111,7 +109,7 @@ export const AccountItem = ({
           <p className="alian-name">{alianName}</p>
           <AddressViewer address={account.address} showArrow={false} />
         </div>
-        <div className="text-12 text-r-neutral-body native-token-balance">
+        <div className="text-12 text-gray-light native-token-balance">
           {nativeTokenBalance !== null &&
             `${formatTokenAmount(nativeTokenBalance)} ${nativeTokenSymbol}`}
         </div>
@@ -161,7 +159,7 @@ const AccountSelectDrawer = ({
   return (
     <Drawer
       height={440}
-      className="account-select is-support-darkmode"
+      className="account-select"
       visible={visible}
       placement="bottom"
       maskClosable

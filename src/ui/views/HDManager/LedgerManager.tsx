@@ -3,7 +3,7 @@ import { MainContainer } from './MainContainer';
 import { useWallet } from '@/ui/utils';
 import { HARDWARE_KEYRING_TYPES } from '@/constant';
 import { Modal } from 'antd';
-import { ReactComponent as RcSettingSVG } from 'ui/assets/setting-outline.svg';
+import { ReactComponent as SettingSVG } from 'ui/assets/setting-outline.svg';
 import {
   AdvancedSettings,
   SettingData,
@@ -126,7 +126,7 @@ export const LedgerManager: React.FC = () => {
   return (
     <>
       <div className="setting" onClick={openAdvanced}>
-        <RcSettingSVG className="icon text-r-neutral-title1" />
+        <SettingSVG className="icon" />
         <span className="title">
           {t('page.newAddress.hd.advancedSettings')}
         </span>
@@ -136,7 +136,7 @@ export const LedgerManager: React.FC = () => {
 
       <Modal
         destroyOnClose
-        className="AdvancedModal modal-support-darkmode"
+        className="AdvancedModal"
         title={t('page.newAddress.hd.customAddressHdPath')}
         visible={visibleAdvanced}
         centered

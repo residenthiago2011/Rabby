@@ -1,4 +1,3 @@
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 import { useRabbySelector } from '@/ui/store';
 import { splitNumberByStep, useWallet } from '@/ui/utils';
 import { findChainByEnum } from '@/utils/chain';
@@ -7,7 +6,7 @@ import { Skeleton } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo } from 'react';
 import { useAsync } from 'react-use';
-import { ReactComponent as RcIconGas } from 'ui/assets/dashboard/gas.svg';
+import IconGas from 'ui/assets/dashboard/gas.svg';
 
 interface Props {
   currentConnectedSiteChain: CHAINS_ENUM;
@@ -91,12 +90,7 @@ export const GasPriceBar: React.FC<Props> = ({ currentConnectedSiteChain }) => {
     >
       <div className="eth-price">
         {tokenLoading ? (
-          <Skeleton.Avatar
-            className="bg-transparent"
-            size={18}
-            active
-            shape="circle"
-          />
+          <Skeleton.Avatar size={18} active shape="circle" />
         ) : (
           <img
             src={tokenLogo}
@@ -107,7 +101,7 @@ export const GasPriceBar: React.FC<Props> = ({ currentConnectedSiteChain }) => {
           />
         )}
         {currentPriceLoading ? (
-          <Skeleton.Button className="h-[14px] bg-transparent" active={true} />
+          <Skeleton.Button className="h-[14px]" active={true} />
         ) : (
           <>
             <div className="gasprice">
@@ -135,12 +129,9 @@ export const GasPriceBar: React.FC<Props> = ({ currentConnectedSiteChain }) => {
         )}
       </div>
       <div className="gas-container">
-        <ThemeIcon
-          src={RcIconGas}
-          className="w-[16px] h-[16px] relative -top-1"
-        />
+        <img src={IconGas} className="w-[16px] h-[16px] relative -top-1" />
         {gasPriceLoading ? (
-          <Skeleton.Button className="h-[14px] bg-transparent" active={true} />
+          <Skeleton.Button className="h-[14px]" active={true} />
         ) : (
           <>
             <div className="gasprice">{`${splitNumberByStep(gasPrice)}`}</div>

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import clsx from 'clsx';
 import { Field, Checkbox } from 'ui/component';
 import { connectStore, useRabbyDispatch } from 'ui/store';
+import LessPalette from 'ui/style/var-defs';
 import { Button } from 'antd';
 import LogoSVG from '@/ui/assets/logo.svg';
 
@@ -12,7 +13,7 @@ const QuestionsWrapper = styled.div`
     font-weight: 500;
     font-size: 13px;
     line-height: 16px;
-    color: var(--r-neutral-title-1);
+    color: #13141a;
   }
 `;
 
@@ -21,7 +22,7 @@ const RiskTipText = styled.p`
   font-size: 17px;
   line-height: 24px;
   text-align: center;
-  color: var(--r-neutral-title-1);
+  color: ${LessPalette['@color-title']};
 `;
 
 function useQuestionsCheck() {
@@ -90,14 +91,14 @@ const RiskCheck = () => {
       <div
         className={clsx(
           'px-[120px] pt-[32px] pb-[40px]',
-          'bg-r-neutral-card-1 rounded-[12px]'
+          'bg-white rounded-[12px]'
         )}
       >
         <h1
           className={clsx(
             'flex items-center justify-center',
             'space-x-[16px] mb-[24px]',
-            'text-[20px] text-r-neutral-title-1'
+            'text-[20px] text-gray-title'
           )}
         >
           <span>{t('page.newAddress.createNewSeedPhrase')}</span>
@@ -115,8 +116,8 @@ const RiskCheck = () => {
                 <Field
                   key={`item-${q.index}`}
                   className={clsx(
-                    'bg-r-neutral-card-2 flex justify-between items-center p-16 border transition-colors',
-                    'border-transparent hover:border-rabby-blue-default hover:bg-r-blue-light-1',
+                    'bg-gray-bg flex justify-between items-center p-16 border transition-colors',
+                    'border-transparent hover:border-blue-light',
                     'text-13'
                   )}
                   leftIcon={
@@ -124,7 +125,7 @@ const RiskCheck = () => {
                       checked={q.checked}
                       width={'20px'}
                       height={'20px'}
-                      background="var(--r-green-default, #2ABB7F)"
+                      background="#27C193"
                       onChange={handleClickItem}
                     />
                   }

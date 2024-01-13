@@ -3,58 +3,52 @@ import { Button, DrawerProps, Form, Input, message, Modal, Switch } from 'antd';
 import clsx from 'clsx';
 import {
   CHAINS,
-  DARK_MODE_TYPE,
   INITIAL_OPENAPI_URL,
   INITIAL_TESTNET_OPENAPI_URL,
   LANGS,
-  ThemeIconType,
-  ThemeModes,
 } from 'consts';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHistory } from 'react-router-dom';
-import { ReactComponent as RcIconActivities } from 'ui/assets/dashboard/activities.svg';
-import { ReactComponent as RcIconArrowRight } from 'ui/assets/dashboard/settings/icon-right-arrow.svg';
-import { ReactComponent as RcIconArrowBlueRight } from 'ui/assets/dashboard/settings/icon-right-arrow-blue.svg';
-import { ReactComponent as RcIconArrowOrangeRight } from 'ui/assets/dashboard/settings/icon-right-arrow-orange.svg';
+import IconActivities from 'ui/assets/dashboard/activities.svg';
+import IconArrowRight from 'ui/assets/dashboard/settings/icon-right-arrow.svg';
+import IconArrowBlueRight from 'ui/assets/dashboard/settings/icon-right-arrow-blue.svg';
+import IconArrowOrangeRight from 'ui/assets/dashboard/settings/icon-right-arrow-orange.svg';
 import IconSettingsDeBank from 'ui/assets/dashboard/settings/debank.svg';
 
 import { useRabbyDispatch, useRabbySelector } from '@/ui/store';
-import { ReactComponent as RcIconAddresses } from 'ui/assets/dashboard/addresses.svg';
-import { ReactComponent as RcIconCustomRPC } from 'ui/assets/dashboard/custom-rpc.svg';
-import { ReactComponent as RcIconPreferMetamask } from 'ui/assets/dashboard/icon-prefer-metamask.svg';
-import { ReactComponent as RcIconAutoLock } from 'ui/assets/dashboard/settings/icon-auto-lock.svg';
-import { ReactComponent as RcIconLockWallet } from 'ui/assets/dashboard/settings/lock.svg';
-import { ReactComponent as RcIconWhitelist } from 'ui/assets/dashboard/whitelist.svg';
-import { ReactComponent as RcIconThemeMode } from 'ui/assets/settings/theme-mode.svg';
+import IconAddresses from 'ui/assets/dashboard/addresses.svg';
+import IconCustomRPC from 'ui/assets/dashboard/custom-rpc.svg';
+import IconPreferMetamask from 'ui/assets/dashboard/icon-prefer-metamask.svg';
+import IconAutoLock from 'ui/assets/dashboard/settings/icon-auto-lock.svg';
+import IconLockWallet from 'ui/assets/dashboard/settings/lock.svg';
+import IconWhitelist from 'ui/assets/dashboard/whitelist.svg';
 import IconDiscordHover from 'ui/assets/discord-hover.svg';
-import { ReactComponent as RcIconDiscord } from 'ui/assets/discord.svg';
-import IconTwitterHover from 'ui/assets/twitter-hover.svg';
-import { ReactComponent as RcIconTwitter } from 'ui/assets/twitter.svg';
-import { ReactComponent as RcIconClear } from 'ui/assets/icon-clear.svg';
+import IconDiscord from 'ui/assets/discord.svg';
+import IconClear from 'ui/assets/icon-clear.svg';
 import LogoRabby from 'ui/assets/logo-rabby-large.svg';
-import { ReactComponent as RcIconServer } from 'ui/assets/server.svg';
+import IconServer from 'ui/assets/server.svg';
 import IconSuccess from 'ui/assets/success.svg';
-import { ReactComponent as RcIconTestnet } from 'ui/assets/dashboard/settings/icon-testnet.svg';
+import IconTwitterHover from 'ui/assets/twitter-hover.svg';
+import IconTwitter from 'ui/assets/twitter.svg';
+import IconTestnet from 'ui/assets/dashboard/settings/icon-testnet.svg';
 import { Field, PageHeader, Popup } from 'ui/component';
 import AuthenticationModalPromise from 'ui/component/AuthenticationModal';
 import { openInTab, useWallet } from 'ui/utils';
 import './style.less';
 
 import IconCheck from 'ui/assets/check-2.svg';
-import { ReactComponent as RcIconSettingsFeatureConnectedDapps } from 'ui/assets/dashboard/settings/connected-dapps.svg';
-import { ReactComponent as RcIconSettingsAboutFollowUs } from 'ui/assets/dashboard/settings/follow-us.svg';
-import { ReactComponent as RcIconSettingsAboutSupporetedChains } from 'ui/assets/dashboard/settings/supported-chains.svg';
-import { ReactComponent as RcIconSettingsAboutVersion } from 'ui/assets/dashboard/settings/version.svg';
+import IconSettingsFeatureConnectedDapps from 'ui/assets/dashboard/settings/connected-dapps.svg';
+import IconSettingsAboutFollowUs from 'ui/assets/dashboard/settings/follow-us.svg';
+import IconSettingsAboutSupporetedChains from 'ui/assets/dashboard/settings/supported-chains.svg';
+import IconSettingsAboutVersion from 'ui/assets/dashboard/settings/version.svg';
 import IconSettingsRabbyBadge from 'ui/assets/badge/rabby-badge-s.svg';
-import { ReactComponent as RcIconI18n } from 'ui/assets/dashboard/settings/i18n.svg';
+import IconI18n from 'ui/assets/dashboard/settings/i18n.svg';
 
 import stats from '@/stats';
 import { useAsync, useCss } from 'react-use';
 import semver from 'semver-compare';
 import { Contacts, RecentConnections } from '..';
-import SwitchThemeModal from './components/SwitchThemeModal';
-import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 const useAutoLockOptions = () => {
   const { t } = useTranslation();
@@ -426,17 +420,15 @@ const ClaimRabbyBadge = ({ onClick }: { onClick: () => void }) => {
     <div className="setting-block">
       <div className="setting-items">
         <Field
-          leftIcon={
-            <ThemeIcon src={IconSettingsRabbyBadge} className="w-28 h-28" />
-          }
+          leftIcon={<img src={IconSettingsRabbyBadge} className="w-28 h-28" />}
           rightIcon={
-            <ThemeIcon
-              src={RcIconArrowBlueRight}
+            <img
+              src={IconArrowBlueRight}
               className="icon icon-arrow-right w-20 h-20"
             />
           }
           onClick={onClick}
-          className="text-blue-light bg-r-blue-light-1 font-medium"
+          className="text-blue-light bg-[#f5f7ff] font-medium"
         >
           {t('page.dashboard.settings.claimRabbyBadge')}
         </Field>
@@ -452,19 +444,17 @@ const RequestDeBankTestnetGasToken = () => {
     <div className="setting-block mt-8">
       <div className="setting-items">
         <Field
-          leftIcon={
-            <ThemeIcon src={IconSettingsDeBank} className="w-28 h-28" />
-          }
+          leftIcon={<img src={IconSettingsDeBank} className="w-28 h-28" />}
           rightIcon={
-            <ThemeIcon
-              src={RcIconArrowOrangeRight}
+            <img
+              src={IconArrowOrangeRight}
               className="icon icon-arrow-right w-20 h-20"
             />
           }
           onClick={() => {
             history.push('/request-debank-testnet-gas-token');
           }}
-          className="text-[#FF6238] bg-[#FFF4F1] dark:bg-[#564A46] font-medium hover:border-[#FF6238]"
+          className="text-[#FF6238] bg-[#FFF4F1] font-medium hover:border-[#FF6238]"
         >
           {t('page.dashboard.settings.requestDeBankTestnetGasToken')}
         </Field>
@@ -474,7 +464,7 @@ const RequestDeBankTestnetGasToken = () => {
 };
 
 type SettingItem = {
-  leftIcon: ThemeIconType;
+  leftIcon: string;
   content: React.ReactNode;
   description?: React.ReactNode;
   rightIcon?: React.ReactNode;
@@ -494,7 +484,6 @@ const SettingsInner = ({
   const [showResetAccountModal, setShowResetAccountModal] = useState(false);
   const [isShowAutoLockModal, setIsShowAutoLockModal] = useState(false);
   const [isShowLangModal, setIsShowLangModal] = useState(false);
-  const [isShowThemeModeModal, setIsShowThemeModeModal] = useState(false);
   const [contactsVisible, setContactsVisible] = useState(false);
   const [whitelistEnable, setWhitelistEnable] = useState(true);
   const [connectedDappsVisible, setConnectedDappsVisible] = useState(false);
@@ -507,7 +496,6 @@ const SettingsInner = ({
   const isShowTestnet = useRabbySelector(
     (state) => state.preference.isShowTestnet
   );
-  const themeMode = useRabbySelector((state) => state.preference.themeMode);
 
   const openapiStore = useRabbySelector((state) => state.openapi);
 
@@ -558,7 +546,6 @@ const SettingsInner = ({
 
   const handleClickClearWatchMode = () => {
     confirm({
-      className: 'modal-support-darkmode',
       title: t('page.dashboard.settings.warning'),
       content: t('page.dashboard.settings.clearWatchAddressContent'),
       onOk() {
@@ -578,13 +565,14 @@ const SettingsInner = ({
   };
 
   const updateVersionClassName = useCss({
+    '& .ant-modal-content': {
+      background: '#fff',
+    },
     '& .ant-modal-body': {
       padding: '15px 14px 28px 14px',
     },
     '& .ant-modal-confirm-content': {
       padding: '24px 0 0 0',
-      background: 'transparent',
-      'background-color': 'transparent',
     },
     '& .ant-modal-confirm-btns': {
       justifyContent: 'center',
@@ -600,10 +588,10 @@ const SettingsInner = ({
         width: 320,
         closable: true,
         centered: true,
-        className: clsx(updateVersionClassName, 'modal-support-darkmode'),
-        title: t('page.dashboard.settings.updateVersion.title'),
+        className: updateVersionClassName,
+        title: null,
         content: (
-          <div className="text-14 leading-[18px] text-center text-r-neutral-body">
+          <div className="text-14 leading-[18px] text-center text-gray-subTitle">
             {t('page.dashboard.settings.updateVersion.content')}
           </div>
         ),
@@ -630,7 +618,7 @@ const SettingsInner = ({
       label: t('page.dashboard.settings.features.label'),
       items: [
         {
-          leftIcon: RcIconLockWallet,
+          leftIcon: IconLockWallet,
           content: t('page.dashboard.settings.features.lockWallet'),
           onClick: () => {
             lockWallet();
@@ -643,7 +631,7 @@ const SettingsInner = ({
           },
         },
         {
-          leftIcon: RcIconActivities,
+          leftIcon: IconActivities,
           content: t('page.dashboard.settings.features.signatureRecord'),
           onClick: () => {
             history.push('/activities');
@@ -656,7 +644,7 @@ const SettingsInner = ({
           },
         },
         {
-          leftIcon: RcIconAddresses,
+          leftIcon: IconAddresses,
           content: t('page.dashboard.settings.features.manageAddress'),
           onClick: () => {
             history.push('/settings/address');
@@ -669,7 +657,7 @@ const SettingsInner = ({
           },
         },
         {
-          leftIcon: RcIconSettingsFeatureConnectedDapps,
+          leftIcon: IconSettingsFeatureConnectedDapps,
           content: t('page.dashboard.settings.features.connectedDapp'),
           onClick: () => {
             setConnectedDappsVisible(true);
@@ -687,7 +675,7 @@ const SettingsInner = ({
       label: t('page.dashboard.settings.settings.label'),
       items: [
         {
-          leftIcon: RcIconWhitelist,
+          leftIcon: IconWhitelist,
           content: t(
             'page.dashboard.settings.settings.enableWhitelistForSendingAssets'
           ),
@@ -699,7 +687,7 @@ const SettingsInner = ({
           ),
         },
         {
-          leftIcon: RcIconTestnet,
+          leftIcon: IconTestnet,
           content: t('page.dashboard.settings.settings.enableTestnets'),
           rightIcon: (
             <Switch
@@ -709,7 +697,7 @@ const SettingsInner = ({
           ),
         },
         {
-          leftIcon: RcIconCustomRPC,
+          leftIcon: IconCustomRPC,
           content: t('page.dashboard.settings.settings.customRpc'),
           onClick: () => {
             history.push('/custom-rpc');
@@ -722,7 +710,7 @@ const SettingsInner = ({
           },
         },
         {
-          leftIcon: RcIconI18n,
+          leftIcon: IconI18n,
           content: t('page.dashboard.settings.settings.currentLanguage'),
           onClick: () => {
             matomoRequestEvent({
@@ -735,49 +723,15 @@ const SettingsInner = ({
           },
           rightIcon: (
             <>
-              <span
-                className="text-14 mr-[8px] text-r-neutral-title-1"
-                role="button"
-              >
+              <span className="text-14 mr-[8px] text-[#13141a]" role="button">
                 {langLabel}
               </span>
-              <ThemeIcon
-                src={RcIconArrowRight}
-                className="icon icon-arrow-right"
-              />
+              <img src={IconArrowRight} className="icon icon-arrow-right" />
             </>
           ),
         },
         {
-          leftIcon: RcIconThemeMode,
-          content: t('page.dashboard.settings.settings.toggleThemeMode'),
-          onClick: () => {
-            matomoRequestEvent({
-              category: 'Setting',
-              action: 'clickToUse',
-              label: 'Theme Mode',
-            });
-            reportSettings('Theme Mode');
-            setIsShowThemeModeModal(true);
-          },
-          rightIcon: (
-            <>
-              <span
-                className="text-14 mr-[8px] text-r-neutral-title-1"
-                role="button"
-              >
-                {ThemeModes.find((item) => item.code === themeMode)?.name ||
-                  '-'}
-              </span>
-              <ThemeIcon
-                src={RcIconArrowRight}
-                className="icon icon-arrow-right"
-              />
-            </>
-          ),
-        },
-        {
-          leftIcon: RcIconPreferMetamask,
+          leftIcon: IconPreferMetamask,
           content: t('page.dashboard.settings.settings.metamaskPreferredDapps'),
           onClick: () => {
             history.push('/prefer-metamask-dapps');
@@ -790,7 +744,7 @@ const SettingsInner = ({
           },
         },
         {
-          leftIcon: RcIconAutoLock,
+          leftIcon: IconAutoLock,
           content: t('page.dashboard.settings.autoLockTime'),
           onClick: () => {
             matomoRequestEvent({
@@ -803,21 +757,15 @@ const SettingsInner = ({
           },
           rightIcon: (
             <>
-              <span
-                className="text-14 mr-[8px] text-r-neutral-title-1"
-                role="button"
-              >
+              <span className="text-14 mr-[8px] text-[#13141a]" role="button">
                 {autoLockTimeLabel}
               </span>
-              <ThemeIcon
-                src={RcIconArrowRight}
-                className="icon icon-arrow-right"
-              />
+              <img src={IconArrowRight} className="icon icon-arrow-right" />
             </>
           ),
         },
         {
-          leftIcon: RcIconClear,
+          leftIcon: IconClear,
           content: t('page.dashboard.settings.clearPending'),
           onClick: () => {
             matomoRequestEvent({
@@ -829,10 +777,7 @@ const SettingsInner = ({
             reportSettings('Reset Account');
           },
           rightIcon: (
-            <ThemeIcon
-              src={RcIconArrowRight}
-              className="icon icon-arrow-right"
-            />
+            <img src={IconArrowRight} className="icon icon-arrow-right" />
           ),
         },
       ] as SettingItem[],
@@ -841,7 +786,7 @@ const SettingsInner = ({
       label: t('page.dashboard.settings.aboutUs'),
       items: [
         {
-          leftIcon: RcIconSettingsAboutVersion,
+          leftIcon: IconSettingsAboutVersion,
           content: t('page.dashboard.settings.currentVersion'),
           onClick: () => {
             updateVersion();
@@ -855,7 +800,7 @@ const SettingsInner = ({
           rightIcon: (
             <>
               <span
-                className="text-14 mr-[8px] text-r-neutral-title-1"
+                className="text-14 mr-[8px] text-[#13141a]"
                 role="button"
                 onClick={updateVersion}
               >
@@ -870,25 +815,19 @@ const SettingsInner = ({
                   <span
                     className={clsx('underline')}
                     role="button"
-                    onClick={(evt) => {
-                      evt.stopPropagation();
-                      updateVersion();
-                    }}
+                    onClick={updateVersion}
                   >
                     {t('page.dashboard.settings.updateAvailable')}
                   </span>
                   )
                 </span>
               </span>
-              <ThemeIcon
-                src={RcIconArrowRight}
-                className="icon icon-arrow-right"
-              />
+              <img src={IconArrowRight} className="icon icon-arrow-right" />
             </>
           ),
         },
         {
-          leftIcon: RcIconSettingsAboutSupporetedChains,
+          leftIcon: IconSettingsAboutSupporetedChains,
           content: t('page.dashboard.settings.supportedChains'),
           onClick: () => {
             history.push('/settings/chain-list');
@@ -901,21 +840,15 @@ const SettingsInner = ({
           },
           rightIcon: (
             <>
-              <span
-                className="text-14 mr-[8px] text-r-neutral-title-1"
-                role="button"
-              >
+              <span className="text-14 mr-[8px] text-[#13141a]" role="button">
                 {Object.values(CHAINS).length}
               </span>
-              <ThemeIcon
-                src={RcIconArrowRight}
-                className="icon icon-arrow-right"
-              />
+              <img src={IconArrowRight} className="icon icon-arrow-right" />
             </>
           ),
         },
         {
-          leftIcon: RcIconSettingsAboutFollowUs,
+          leftIcon: IconSettingsAboutFollowUs,
           content: t('page.dashboard.settings.followUs'),
           // onClick: () => {},
           rightIcon: (
@@ -934,13 +867,13 @@ const SettingsInner = ({
                 }}
                 className="ml-12 group"
               >
-                <ThemeIcon
-                  src={RcIconTwitter}
-                  className="w-20 group-hover:w-0 group-hover:h-0 group-hover:overflow-hidden"
+                <img
+                  src={IconTwitter}
+                  className="w-16 group-hover:w-0 group-hover:h-0 group-hover:overflow-hidden"
                 />
-                <ThemeIcon
+                <img
                   src={IconTwitterHover}
-                  className="w-0 h-0 overflow-hidden group-hover:w-20 group-hover:h-20"
+                  className=" w-0 h-0 overflow-hidden group-hover:w-16 group-hover:h-16"
                 />
               </a>
               <a
@@ -957,13 +890,13 @@ const SettingsInner = ({
                 }}
                 className="ml-12 group"
               >
-                <ThemeIcon
-                  src={RcIconDiscord}
-                  className="w-20 overflow-hidden group-hover:w-0 group-hover:h-0 "
+                <img
+                  src={IconDiscord}
+                  className="w-16 overflow-hidden group-hover:w-0 group-hover:h-0 "
                 />
-                <ThemeIcon
+                <img
                   src={IconDiscordHover}
-                  className="w-0 h-0 overflow-hidden group-hover:w-20 group-hover:h-20"
+                  className=" w-0 h-0 overflow-hidden group-hover:w-16 group-hover:h-16"
                 />
               </a>
             </>
@@ -978,19 +911,19 @@ const SettingsInner = ({
       -1,
       0,
       {
-        leftIcon: RcIconServer,
+        leftIcon: IconServer,
         content: t('page.dashboard.settings.backendServiceUrl'),
         onClick: () => setShowOpenApiModal(true),
         rightIcon: (
-          <ThemeIcon src={RcIconArrowRight} className="icon icon-arrow-right" />
+          <img src={IconArrowRight} className="icon icon-arrow-right" />
         ),
       } as typeof renderData.features.items[0],
       {
-        leftIcon: RcIconServer,
+        leftIcon: IconServer,
         content: t('page.dashboard.settings.testnetBackendServiceUrl'),
         onClick: () => setShowTestnetOpenApiModal(true),
         rightIcon: (
-          <ThemeIcon src={RcIconArrowRight} className="icon icon-arrow-right" />
+          <img src={IconArrowRight} className="icon icon-arrow-right" />
         ),
       } as typeof renderData.features.items[0]
     );
@@ -1054,13 +987,11 @@ const SettingsInner = ({
                 {group.items.map((data, idxl2) => (
                   <Field
                     key={`g-${idxl1}-item-${idxl2}`}
-                    leftIcon={
-                      <ThemeIcon src={data.leftIcon} className="icon" />
-                    }
+                    leftIcon={<img src={data.leftIcon} className="icon" />}
                     rightIcon={
                       data.rightIcon || (
-                        <ThemeIcon
-                          src={RcIconArrowRight}
+                        <img
+                          src={IconArrowRight}
                           className="icon icon-arrow-right"
                         />
                       )
@@ -1080,7 +1011,7 @@ const SettingsInner = ({
         })}
       </div>
       <footer className="footer">
-        <div className="px-8 py-2 rounded hover:bg-r-blue-light-1 inline-block">
+        <div className="px-8 py-2 rounded hover:bg-[#EEF1FF] inline-block">
           <img
             className="inline-block cursor-pointer"
             src={LogoRabby}
@@ -1133,11 +1064,6 @@ const SettingsInner = ({
         onFinish={() => setIsShowLangModal(false)}
         onCancel={() => setIsShowLangModal(false)}
       />
-      <SwitchThemeModal
-        visible={isShowThemeModeModal}
-        onFinish={() => setIsShowThemeModeModal(false)}
-        onCancel={() => setIsShowThemeModeModal(false)}
-      />
       <RecentConnections
         visible={connectedDappsVisible}
         onClose={() => {
@@ -1154,11 +1080,9 @@ const Settings = (props: SettingsProps) => {
     <Popup
       visible={visible}
       onClose={onClose}
-      height={488}
+      height={523}
       bodyStyle={{ height: '100%', padding: '20px 20px 0 20px' }}
       destroyOnClose
-      className="settings-popup-wrapper"
-      isSupportDarkMode
     >
       <SettingsInner {...props} />
     </Popup>

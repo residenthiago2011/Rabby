@@ -5,16 +5,11 @@ import { matomoRequestEvent } from '@/utils/matomo-request';
 import { sortBy } from 'lodash';
 import { StrayPageWithButton } from 'ui/component';
 import AddressItem from 'ui/component/AddressList/AddressItem';
-import { getUiType, useApproval } from 'ui/utils';
+import { getUiType } from 'ui/utils';
 import { Account } from 'background/service/preference';
 import clsx from 'clsx';
 import stats from '@/stats';
-import {
-  KEYRING_ICONS,
-  WALLET_BRAND_CONTENT,
-  KEYRING_CLASS,
-  HardwareKeyrings,
-} from 'consts';
+import { KEYRING_ICONS, WALLET_BRAND_CONTENT, KEYRING_CLASS } from 'consts';
 import { IconImportSuccess } from 'ui/assets';
 import SuccessLogo from 'ui/assets/success-logo.svg';
 import './index.less';
@@ -50,7 +45,6 @@ const ImportSuccess = ({ isPopup = false }: { isPopup?: boolean }) => {
     isMnemonics = false,
     importedLength = 0,
   } = state;
-  const [, resolveApproval] = useApproval();
 
   const handleNextClick = async (e: React.MouseEvent<HTMLElement>) => {
     e?.stopPropagation();
@@ -62,12 +56,6 @@ const ImportSuccess = ({ isPopup = false }: { isPopup?: boolean }) => {
 
       return;
     }
-
-    if (getUiType().isNotification) {
-      resolveApproval();
-      return;
-    }
-
     history.push('/dashboard');
   };
   const importedIcon =
@@ -85,9 +73,7 @@ const ImportSuccess = ({ isPopup = false }: { isPopup?: boolean }) => {
   };
 
   useEffect(() => {
-    if (
-      Object.values(KEYRING_CLASS.HARDWARE).includes(accounts[0].type as any)
-    ) {
+    if (Object.values(KEYRING_CLASS.HARDWARE).includes(accounts[0].type)) {
       stats.report('importHardware', {
         type: accounts[0].type,
       });
@@ -116,17 +102,23 @@ const ImportSuccess = ({ isPopup = false }: { isPopup?: boolean }) => {
     >
       {isPopup &&
         (!isWide ? (
-          <header className="create-new-header create-password-header h-[200px] dark:bg-r-blue-disable">
+          <header className="create-new-header create-password-header h-[200px]">
             <img
-              className="w-[60px] h-[60px] mx-auto mb-[20px] mt-[-4px]"
+              className="ml-[12px]"
+              src="/images/logo-rabby.svg"
+              alt="rabby logo"
+            />
+            <img
+              className="w-[80px] h-[80px] mx-auto mb-[16px] mt-[-4px]"
               src={SuccessLogo}
             />
-            <p className="text-20 mb-4 mt-0 text-white text-center font-bold">
+            <p className="text-24 mb-4 mt-0 text-white text-center font-bold">
               {title || t('page.importSuccess.title')}
             </p>
+            <img src="/images/success-mask.png" className="mask" />
           </header>
         ) : (
-          <div className="create-new-header create-password-header h-[200px] dark:bg-r-blue-disable">
+          <div className="create-new-header create-password-header h-[200px]">
             <div className="rabby-container">
               <img
                 className="w-[80px] h-[80px] mx-auto mb-[16px] mt-[-4px]"
@@ -176,7 +168,7 @@ const ImportSuccess = ({ isPopup = false }: { isPopup?: boolean }) => {
           >
             {sortBy(accounts, (item) => item?.index).map((account, index) => (
               <AddressItem
-                className="mb-12 rounded bg-r-neutral-card-1 py-12 pl-16 h-[92px] flex"
+                className="mb-12 rounded bg-white py-12 pl-16 h-[92px] flex"
                 key={account.address}
                 account={account}
                 showAssets

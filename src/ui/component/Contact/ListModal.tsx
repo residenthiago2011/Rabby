@@ -95,6 +95,7 @@ const ListModal = ({ visible, onOk, onCancel }: ListModalProps) => {
         wallet.setWhitelist(password, list),
       onFinished() {
         setEditWhitelistVisible(false);
+        dispatch.whitelist.getWhitelist();
         message.success({
           duration: 3,
           icon: <i />,
@@ -128,14 +129,13 @@ const ListModal = ({ visible, onOk, onCancel }: ListModalProps) => {
       placement="bottom"
       height={580}
       closable
-      isSupportDarkMode
     >
       <div
         className={clsx('flex flex-col pb-80 h-full', {
           'pb-0': !whitelistEnabled,
         })}
       >
-        <div className="text-center mb-16 mx-[-10px] text-14 text-r-neutral-body">
+        <div className="text-center mb-16 mx-[-10px] text-14 text-gray-content">
           {whitelistEnabled
             ? t('component.Contact.ListModal.whitelistEnabled')
             : t('component.Contact.ListModal.whitelistDisabled')}

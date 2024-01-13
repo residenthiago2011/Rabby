@@ -8,18 +8,9 @@ import {
   permissionService,
 } from './index';
 import { TotalBalanceResponse, TokenItem } from './openapi';
-import {
-  HARDWARE_KEYRING_TYPES,
-  EVENTS,
-  CHAINS_ENUM,
-  LANGS,
-  DARK_MODE_TYPE,
-} from 'consts';
-import browser from 'webextension-polyfill';
+import { HARDWARE_KEYRING_TYPES, EVENTS, CHAINS_ENUM, LANGS } from 'consts';
+import { browser } from 'webextension-polyfill-ts';
 import semver from 'semver-compare';
-import { syncStateToUI } from '../utils/broadcastToUI';
-import { BROADCAST_TO_UI_EVENTS } from '@/utils/broadcastToUI';
-import dayjs from 'dayjs';
 
 const version = process.env.release || '0';
 
@@ -100,21 +91,7 @@ export interface PreferenceStore {
   autoLockTime?: number;
   hiddenBalance?: boolean;
   isShowTestnet?: boolean;
-  themeMode?: DARK_MODE_TYPE;
-  addressSortStore: AddressSortStore;
 }
-
-export interface AddressSortStore {
-  search: string;
-  sortType: 'usd' | 'addressType' | 'alphabet';
-  lastScrollOffset?: number;
-  lastCurrentRecordTime?: number;
-}
-
-const defaultAddressSortStore: AddressSortStore = {
-  search: '',
-  sortType: 'usd',
-};
 
 class PreferenceService {
   store!: PreferenceStore;
@@ -156,13 +133,8 @@ class PreferenceService {
         collectionStarred: [],
         hiddenBalance: false,
         isShowTestnet: false,
-        themeMode: DARK_MODE_TYPE.light,
-        addressSortStore: {
-          ...defaultAddressSortStore,
-        },
       },
     });
-
     if (
       !this.store.locale ||
       !LANGS.find((item) => item.code === this.store.locale)
@@ -248,9 +220,6 @@ class PreferenceService {
   };
 
   getPreference = (key?: string) => {
-    if (!key || ['search', 'lastCurrent'].includes(key)) {
-      this.resetAddressSortStoreExpiredValue();
-    }
     return key ? this.store[key] : this.store;
   };
 
@@ -408,7 +377,10 @@ class PreferenceService {
       sessionService.broadcastEvent('accountsChanged', [
         account.address.toLowerCase(),
       ]);
-      syncStateToUI(BROADCAST_TO_UI_EVENTS.accountsChanged, account);
+      eventBus.emit(EVENTS.broadcastToUI, {
+        method: 'accountsChanged',
+        params: account,
+      });
     }
   };
 
@@ -480,14 +452,6 @@ class PreferenceService {
   setLocale = (locale: string) => {
     this.store.locale = locale;
     i18n.changeLanguage(locale);
-  };
-
-  getThemeMode = () => {
-    return this.store.themeMode;
-  };
-
-  setThemeMode = (themeMode: DARK_MODE_TYPE) => {
-    this.store.themeMode = themeMode;
   };
 
   updateUseLedgerLive = async (value: boolean) => {
@@ -726,48 +690,6 @@ class PreferenceService {
   };
   resetCurrentCoboSafeAddress = async () => {
     this.setCurrentAccount(this.currentCoboSafeAddress ?? null);
-  };
-
-  resetAddressSortStoreExpiredValue = () => {
-    if (
-      !this.store.addressSortStore.lastCurrentRecordTime ||
-      (this.store.addressSortStore.lastCurrentRecordTime &&
-        dayjs().isAfter(
-          dayjs
-            .unix(this.store.addressSortStore.lastCurrentRecordTime)
-            .add(15, 'minute')
-        ))
-    ) {
-      this.store.addressSortStore = {
-        ...this.store.addressSortStore,
-        search: '',
-        lastScrollOffset: undefined,
-        lastCurrentRecordTime: undefined,
-      };
-    }
-  };
-
-  getAddressSortStoreValue = (key: keyof AddressSortStore) => {
-    if (['search', 'lastScrollOffset'].includes(key)) {
-      this.resetAddressSortStoreExpiredValue();
-    }
-    return this.store.addressSortStore[key];
-  };
-
-  setAddressSortStoreValue = <K extends keyof AddressSortStore>(
-    key: K,
-    value: AddressSortStore[K]
-  ) => {
-    if (['search', 'lastCurrent'].includes(key)) {
-      this.store.addressSortStore = {
-        ...this.store.addressSortStore,
-        lastCurrentRecordTime: dayjs().unix(),
-      };
-    }
-    this.store.addressSortStore = {
-      ...this.store.addressSortStore,
-      [key]: value,
-    };
   };
 }
 

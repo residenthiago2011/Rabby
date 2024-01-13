@@ -61,12 +61,11 @@ export const WarningOrChecked = ({
 const ReceiveWrapper = styled.div`
   position: relative;
   margin-top: 24px;
-  border: 0.5px solid var(--r-neutral-line, #d3d8e0);
-  border: 1px solid var(--r-neutral-line, #d3d8e0);
+  border: 1px solid #e5e9ef;
   border-radius: 4px;
   padding: 12px;
 
-  color: var(--r-neutral-title-1, #192945);
+  color: #4b4d59;
   font-size: 13px;
   .receive-token {
     font-size: 15px;
@@ -116,12 +115,8 @@ const ReceiveWrapper = styled.div`
 
   .footer {
     position: relative;
-    border-top: 0.5px solid var(--r-neutral-line, #d3d8e0);
+    border-top: 0.5px solid #e5e9ef;
     padding-top: 8px;
-
-    .rate {
-      color: var(--r-neutral-body, #d3d8e0) !important;
-    }
   }
   .quote-provider {
     position: absolute;
@@ -135,13 +130,14 @@ const ReceiveWrapper = styled.div`
     font-size: 13px;
     cursor: pointer;
 
-    color: var(--r-neutral-body, #d3d8e0);
-    background: var(--r-blue-light-2);
+    color: #13141a;
+
+    background: #e4e8ff;
     border-radius: 4px;
     border: 1px solid transparent;
     &:hover {
-      /* background: var(--r-neutral-bg-1, #fff); */
-      border: 1px solid var(--r-neutral-line, #d3d8e0);
+      background: #d4daff;
+      border: 1px solid rgba(134, 151, 255, 0.5);
     }
   }
 `;
@@ -245,7 +241,7 @@ export const ReceiveDetails = (
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 w-[108px] text-13 font-medium text-r-neutral-title-1 h-18">
+            <div className="flex items-center gap-2 w-[108px] text-13 font-medium text-gray-title h-18">
               <span>
                 {isWrapToken
                   ? t('page.swap.wrap-contract')
@@ -261,7 +257,7 @@ export const ReceiveDetails = (
               )}
             </div>
             {!!activeProvider?.gasUsd && (
-              <div className="flex items-center gap-2 text-12 text-r-neutral-foot font-normal">
+              <div className="flex items-center gap-2 text-12 text-gray-content font-normal">
                 <img src={ImgGas} className="w-14 h-14 relative top-[-1px] " />
                 <span>{activeProvider?.gasUsd}</span>
               </div>
@@ -269,7 +265,7 @@ export const ReceiveDetails = (
           </div>
         </div>
         <div className="right relative flex flex-col">
-          <div className="flex items-center gap-2 text-15 font-medium text-r-neutral-title-1 h-18 ml-auto">
+          <div className="flex items-center gap-2 text-15 font-medium text-gray-title h-18 ml-auto">
             <SkeletonChildren
               loading={loading}
               style={{ maxWidth: 144, height: 20, opacity: 0.5 }}
@@ -279,9 +275,7 @@ export const ReceiveDetails = (
                 className="ellipsis"
               >
                 {receiveNum}{' '}
-                <span className="text-r-neutral-foot">
-                  {receiveTokenSymbol}
-                </span>
+                <span className="text-gray-content">{receiveTokenSymbol}</span>
               </span>
               <WarningOrChecked quoteWarning={quoteWarning} />
             </SkeletonChildren>
@@ -289,7 +283,7 @@ export const ReceiveDetails = (
 
           <div
             className={clsx(
-              'flex justify-end items-center gap-2 text-[13px] relative text-12 font-normal text-r-neutral-foot ml-auto',
+              'flex justify-end items-center gap-2 text-[13px] relative text-12 font-normal text-gray-content ml-auto',
               loading && 'opacity-0'
             )}
           >

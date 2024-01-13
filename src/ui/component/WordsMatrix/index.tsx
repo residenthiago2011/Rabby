@@ -2,6 +2,8 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import clsx from 'clsx';
 
+import LessPalette from '@/ui/style/var-defs';
+
 import { styid } from 'ui/utils/styled';
 
 import IconCloseSvg from 'ui/assets/close-icon.svg';
@@ -12,7 +14,7 @@ const ITEM_H = 208 / 4;
 const ROW_COUNT = 3;
 
 const NumberFlag = styled.div`
-  color: var(--r-neutral-foot);
+  color: ${LessPalette['@color-comment-2']};
   font-weight: 400;
   font-size: 12px;
   height: 14px;
@@ -32,7 +34,7 @@ const FocusingBox = styled.div`
 `;
 
 const ErrorBox = styled(FocusingBox)`
-  border-color: var(--r-red-default);
+  border-color: ${LessPalette['@error-color']};
 `;
 
 const MatrixWrapper = styled.div.withConfig<{
@@ -54,13 +56,13 @@ const MatrixWrapper = styled.div.withConfig<{
 
     font-size: 15px;
     font-weight: 500;
-    color: var(--r-neutral-title-1);
+    color: ${LessPalette['@color-title']};
     position: relative;
 
-    border-right: 1px solid var(--r-neutral-line);
-    border-bottom: 1px solid var(--r-neutral-line);
-    border-right: 0.5px solid var(--r-neutral-line);
-    border-bottom: 0.5px solid var(--r-neutral-line);
+    border-right: 1px solid #e1e5f2;
+    border-bottom: 1px solid #e1e5f2;
+    border-right: 0.5px solid #e1e5f2;
+    border-bottom: 0.5px solid #e1e5f2;
 
     ${(props) => {
       const rowCount = props.rowCount || ROW_COUNT;

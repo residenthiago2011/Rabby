@@ -15,9 +15,9 @@ export const getExpandListSwitch = <
 ) => {
   const listLength = list?.length || 0;
 
-  const threshold = Math.min((totalValue || 0) / 1000, 1000);
+  const threadhold = Math.min((totalValue || 0) / 100, 1000);
   const thresholdIndex = list
-    ? list.findIndex((m) => (m._usdValue || m.netWorth || 0) < threshold)
+    ? list.findIndex((m) => (m._usdValue || m.netWorth || 0) < threadhold)
     : -1;
 
   const hasExpandSwitch =
