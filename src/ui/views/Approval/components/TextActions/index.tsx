@@ -4,12 +4,21 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { Tabs } from 'antd';
 import { TextActionData, getActionTypeText } from './utils';
-import IconArrowRight from 'ui/assets/approval/edit-arrow-right.svg';
+import IconArrowRight, {
+  ReactComponent as RcIconArrowRight,
+} from 'ui/assets/approval/edit-arrow-right.svg';
 import CreateKey from './CreateKey';
 import VerifyAddress from './VerifyAddress';
-import IconAlert from 'ui/assets/sign/tx/alert.svg';
+import { TooltipWithMagnetArrow } from '@/ui/component/Tooltip/TooltipWithMagnetArrow';
+import IconQuestionMark from 'ui/assets/sign/question-mark-24.svg';
+import IconRabbyDecoded from 'ui/assets/sign/rabby-decoded.svg';
+import IconCheck, {
+  ReactComponent as RcIconCheck,
+} from 'src/ui/assets/approval/icon-check.svg';
 import clsx from 'clsx';
 import { Popup } from 'ui/component';
+import { NoActionAlert } from '../NoActionAlert/NoActionAlert';
+import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 const { TabPane } = Tabs;
 
@@ -21,7 +30,7 @@ export const SignTitle = styled.div`
     display: flex;
     font-size: 18px;
     line-height: 21px;
-    color: #333333;
+    color: var(--r-neutral-title-1, #f7fafc);
     .icon-speedup {
       width: 10px;
       margin-right: 6px;
@@ -39,12 +48,11 @@ export const SignTitle = styled.div`
 export const ActionWrapper = styled.div`
   border-radius: 8px;
   margin-bottom: 8px;
-  background-color: #fff;
   .action-header {
     display: flex;
     justify-content: space-between;
     background: var(--r-blue-default, #7084ff);
-    padding: 14px;
+    padding: 13px;
     align-items: center;
     color: #fff;
     border-top-left-radius: 8px;
@@ -57,17 +65,38 @@ export const ActionWrapper = styled.div`
     .right {
       font-size: 14px;
       line-height: 16px;
-      .icon-tip {
-        margin-top: 1px;
-        margin-left: 4px;
-        path {
-          stroke: #fff;
+      position: relative;
+      .decode-tooltip {
+        max-width: 358px;
+        &:not(.ant-tooltip-hidden) {
+          left: -321px !important;
+          .ant-tooltip-arrow {
+            left: 333px;
+          }
+        }
+        .ant-tooltip-arrow-content {
+          background-color: var(--r-neutral-bg-1, #fff);
+        }
+        .ant-tooltip-inner {
+          background-color: var(--r-neutral-bg-1, #fff);
+          padding: 0;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--r-neutral-body, #3e495e);
+          border-radius: 6px;
         }
       }
+    }
+    &.is-unknown {
+      background: var(--r-neutral-foot, #6a7587);
     }
   }
   .container {
     padding: 14px;
+    /* border: 0.5px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1)); */
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -87,30 +116,12 @@ export const ActionWrapper = styled.div`
   }
 `;
 
-const NoActionAlert = styled.div`
-  display: flex;
-  align-items: flex-start;
-  background: #e8eaf3;
-  border-radius: 6px;
-  padding: 15px;
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 18px;
-  color: #333333;
-  margin-bottom: 15px;
-  .icon-alert {
-    margin-right: 8px;
-    width: 15px;
-    margin-top: 1px;
-  }
-`;
-
 const MessageWrapper = styled.div`
   .title {
     position: relative;
     font-size: 14px;
     line-height: 16px;
-    color: #666666;
+    color: var(--r-neutral-title-1, #f7fafc);
     text-align: center;
     margin-bottom: 10px;
     margin-left: -20px;
@@ -119,7 +130,7 @@ const MessageWrapper = styled.div`
       content: '';
       width: 40%;
       height: 1px;
-      border-top: 1px dashed #c7c9d7;
+      border-top: 1px dashed var(--r-neutral-line, rgba(255, 255, 255, 0.1));
       position: absolute;
       top: 50%;
       left: 0;
@@ -128,7 +139,7 @@ const MessageWrapper = styled.div`
       content: '';
       width: 40%;
       height: 1px;
-      border-top: 1px dashed #c7c9d7;
+      border-top: 1px dashed var(--r-neutral-line, rgba(255, 255, 255, 0.1));
       position: absolute;
       top: 50%;
       right: 0;
@@ -138,20 +149,20 @@ const MessageWrapper = styled.div`
     padding: 15px;
     word-break: break-all;
     white-space: pre-wrap;
-    background: #ebedf7;
-    border: 1px solid rgba(225, 227, 234, 0.9);
+    background: var(--r-neutral-card-1, #ffffff);
+    border: 1px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1));
     border-radius: 6px;
     font-size: 13px;
     line-height: 16px;
     font-weight: 500;
-    color: #4b4d59;
+    color: var(--r-neutral-body, #3e495e);
     height: 320px;
     overflow-y: auto;
     /* font-family: 'Roboto Mono'; */
   }
   &.no-action {
     .content {
-      background-color: #fff;
+      background: var(--r-neutral-card-3, rgba(255, 255, 255, 0.06));
     }
   }
 `;
@@ -161,14 +172,15 @@ const Actions = ({
   engineResults,
   raw,
   message,
+  origin,
 }: {
   data: TextActionData | null;
   engineResults: Result[];
   raw: string;
   message: string;
+  origin: string;
 }) => {
   const actionName = useMemo(() => {
-    if (!data) return '';
     return getActionTypeText(data);
   }, [data]);
 
@@ -200,15 +212,48 @@ const Actions = ({
           onClick={handleViewRawClick}
         >
           {t('page.signTx.viewRaw')}
-          <img className="icon icon-arrow-right" src={IconArrowRight} />
+          <ThemeIcon className="icon icon-arrow-right" src={RcIconArrowRight} />
         </div>
       </SignTitle>
-      {data && (
-        <ActionWrapper>
-          <div className="action-header">
-            <div className="left">{actionName}</div>
-            <div className="right"></div>
+      <ActionWrapper className="bg-r-neutral-card-1">
+        <div
+          className={clsx('action-header', {
+            'is-unknown': !data,
+          })}
+        >
+          <div className="left">{actionName}</div>
+          <div className="right">
+            <TooltipWithMagnetArrow
+              placement="bottom"
+              overlayClassName="rectangle w-[max-content] decode-tooltip"
+              title={
+                !data ? (
+                  <NoActionAlert
+                    data={{
+                      origin,
+                      text: message,
+                    }}
+                  />
+                ) : (
+                  <span className="flex w-[358px] p-12 items-center">
+                    <ThemeIcon src={RcIconCheck} className="mr-4 w-12" />
+                    {t('page.signTx.decodedTooltip')}
+                  </span>
+                )
+              }
+            >
+              {!data ? (
+                <img src={IconQuestionMark} className="w-24" />
+              ) : (
+                <img
+                  src={IconRabbyDecoded}
+                  className="icon icon-rabby-decoded"
+                />
+              )}
+            </TooltipWithMagnetArrow>
           </div>
+        </div>
+        {data && (
           <div className="container">
             {data.createKey && (
               <CreateKey data={data.createKey} engineResults={engineResults} />
@@ -220,14 +265,8 @@ const Actions = ({
               />
             )}
           </div>
-        </ActionWrapper>
-      )}
-      {!data && (
-        <NoActionAlert>
-          <img src={IconAlert} className="icon icon-alert" />
-          {t('page.signTx.sigCantDecode')}
-        </NoActionAlert>
-      )}
+        )}
+      </ActionWrapper>
       <MessageWrapper
         className={clsx({
           'no-action': !data,

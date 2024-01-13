@@ -34,7 +34,7 @@ import ChainList from './ChainList';
 import AddressManagement from './AddressManagement';
 import SwitchLang from './SwitchLang';
 import Activities from './Activities';
-import History from './History';
+import { HistoryPage } from './History';
 import GnosisTransactionQueue from './GnosisTransactionQueue';
 import QRCodeReader from './QRCodeReader';
 import AdvancedSettings from './AdvanceSettings';
@@ -58,9 +58,13 @@ import { CommonPopup } from './CommonPopup';
 import ManageAddress from './ManageAddress';
 import { NFTView } from './NFTView';
 import { QRCodeConnect } from './ImportHardware/QRCodeConnect';
+import { KeystoneConnect } from './ImportHardware/KeystoneConnect';
 import ApprovalManagePage from './ApprovalManagePage';
 import RequestDeBankTestnetGasToken from './RequestDeBankTestnetGasToken';
 import { ImportCoboArgus } from './ImportCoboArgus/ImportCoboArgus';
+import { PendingDetail } from './PendingDetail';
+import { ImportCoinbase } from './ImportCoinbase/ImportCoinbase';
+import { DappSearchPage } from './DappSearch';
 
 declare global {
   interface Window {
@@ -162,6 +166,9 @@ const Main = () => {
         <PrivateRoute exact path="/import/hardware/ledger">
           <ImportLedgerPathSelect />
         </PrivateRoute>
+        <PrivateRoute exact path="/import/hardware/keystone">
+          <KeystoneConnect />
+        </PrivateRoute>
         <PrivateRoute exact path="/import/hardware/qrcode">
           <QRCodeConnect />
         </PrivateRoute>
@@ -181,7 +188,10 @@ const Main = () => {
           <ImportSuccess />
         </PrivateRoute>
         <PrivateRoute exact path="/history">
-          <History />
+          <HistoryPage />
+        </PrivateRoute>
+        <PrivateRoute exact path="/history/filter-scam">
+          <HistoryPage isFitlerScam={true} />
         </PrivateRoute>
         <PrivateRoute exact path="/activities">
           <Activities />
@@ -194,6 +204,9 @@ const Main = () => {
         </PrivateRoute>
         <PrivateRoute exact path="/import/cobo-argus">
           <ImportCoboArgus />
+        </PrivateRoute>
+        <PrivateRoute exact path="/import/coinbase">
+          <ImportCoinbase />
         </PrivateRoute>
         <PrivateRoute exact path="/add-address">
           <AddAddress />
@@ -262,6 +275,12 @@ const Main = () => {
         </PrivateRoute>
         <PrivateRoute exact path="/approval-manage">
           <ApprovalManagePage />
+        </PrivateRoute>
+        <PrivateRoute exact path="/dapp-search">
+          <DappSearchPage />
+        </PrivateRoute>
+        <PrivateRoute exact path="/pending-detail">
+          <PendingDetail />
         </PrivateRoute>
 
         <PrivateRoute exact path="/import/metamask">

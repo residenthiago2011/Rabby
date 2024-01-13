@@ -17,9 +17,8 @@ import {
   KEYRING_PURPLE_LOGOS,
   KEYRING_CLASS,
   MINIMUM_GAS_LIMIT,
-  L2_ENUMS,
-  INTERNAL_REQUEST_ORIGIN,
-  OP_STACK_ENUMS,
+  CAN_ESTIMATE_L1_FEE_CHAINS,
+  ARB_LIKE_L2_CHAINS,
 } from 'consts';
 import { useRabbyDispatch, useRabbySelector, connectStore } from 'ui/store';
 import { Account, ChainGas } from 'background/service/preference';
@@ -34,20 +33,29 @@ import ContactEditModal from 'ui/component/Contact/EditModal';
 import ContactListModal from 'ui/component/Contact/ListModal';
 import GasReserved from './components/GasReserved';
 import GasSelector from './components/GasSelector';
-import IconWhitelist from 'ui/assets/dashboard/whitelist.svg';
-import IconEdit from 'ui/assets/edit-purple.svg';
+import IconWhitelist, {
+  ReactComponent as RcIconWhitelist,
+} from 'ui/assets/dashboard/whitelist.svg';
+import IconContact, {
+  ReactComponent as RcIconContact,
+} from 'ui/assets/send-token/contact.svg';
+import { ReactComponent as RcIconEdit } from 'ui/assets/edit-purple.svg';
 import IconCopy from 'ui/assets/copy-no-border.svg';
 import IconSuccess from 'ui/assets/success.svg';
-import IconCheck from 'ui/assets/icon-check.svg';
-import IconContact from 'ui/assets/send-token/contact.svg';
-import IconTemporaryGrantCheckbox from 'ui/assets/send-token/temporary-grant-checkbox.svg';
-import TokenInfoArrow from 'ui/assets/send-token/token-info-arrow.svg';
+import IconCheck, {
+  ReactComponent as RcIconCheck,
+} from 'ui/assets/send-token/check.svg';
+import IconTemporaryGrantCheckbox, {
+  ReactComponent as RcIconTemporaryGrantCheckbox,
+} from 'ui/assets/send-token/temporary-grant-checkbox.svg';
+
 import './style.less';
 import { getKRCategoryByType } from '@/utils/transaction';
 import { filterRbiSource, useRbiSource } from '@/ui/utils/ga-event';
 import { UIContactBookItem } from '@/background/service/contactBook';
 import {
   findChainByEnum,
+  findChainByID,
   findChainByServerID,
   makeTokenFromChain,
 } from '@/utils/chain';
@@ -64,6 +72,8 @@ import { isHex } from 'web3-utils';
 import { Chain } from '@debank/common';
 import IconAlertInfo from './alert-info.svg';
 import { formatTxInputDataOnERC20 } from '@/ui/utils/transaction';
+import { useThemeMode } from '@/ui/hooks/usePreference';
+import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
 
 const abiCoder = (abiCoderInst as unknown) as AbiCoder;
 
@@ -303,10 +313,19 @@ const SendToken = () => {
     time_at: 0,
     amount: 0,
   });
+
+  const [safeInfo, setSafeInfo] = useState<{
+    chainId: number;
+    nonce: number;
+  } | null>(null);
   const persistPageStateCache = useCallback(
     async (nextStateCache?: {
       values?: FormSendToken;
       currentToken?: TokenItem | null;
+      safeInfo?: {
+        chainId: number;
+        nonce: number;
+      };
     }) => {
       await wallet.setPageStateCache({
         path: history.location.pathname,
@@ -315,11 +334,12 @@ const SendToken = () => {
         states: {
           values: form.getFieldsValue(),
           currentToken,
+          safeInfo,
           ...nextStateCache,
         },
       });
     },
-    [wallet, history, form, currentToken]
+    [wallet, history, form, currentToken, safeInfo]
   );
   const [inited, setInited] = useState(false);
   const [gasList, setGasList] = useState<GasLevel[]>([]);
@@ -464,6 +484,7 @@ const SendToken = () => {
         front_tx_count: 0,
         estimated_seconds: 0,
         base_fee: 0,
+        priority_price: null,
       };
     } else if (
       lastTimeGas?.lastTimeSelect &&
@@ -533,6 +554,9 @@ const SendToken = () => {
       data: abiCoder.encodeFunctionCall(dataInput[0], dataInput[1]),
       isSend: true,
     };
+    if (safeInfo?.nonce != null) {
+      params.nonce = safeInfo.nonce;
+    }
     if (isNativeToken) {
       params.to = to;
       delete params.data;
@@ -560,12 +584,12 @@ const SendToken = () => {
         } else if (
           code &&
           (code === '0x' || code === '0x0') &&
-          !L2_ENUMS.includes(chain.enum)
+          !ARB_LIKE_L2_CHAINS.includes(chain.enum)
         ) {
           params.gas = intToHex(21000); // L2 has extra validation fee so can not set gasLimit as 21000 when send native token
         }
       } catch (e) {
-        if (!L2_ENUMS.includes(chain.enum)) {
+        if (!ARB_LIKE_L2_CHAINS.includes(chain.enum)) {
           params.gas = intToHex(21000); // L2 has extra validation fee so can not set gasLimit as 21000 when send native token
         }
       }
@@ -790,7 +814,7 @@ const SendToken = () => {
         );
         setEstimateGas(Number(gasUsed));
         let gasTokenAmount = handleGasChange(instant, false, Number(gasUsed));
-        if (OP_STACK_ENUMS.includes(chain)) {
+        if (CAN_ESTIMATE_L1_FEE_CHAINS.includes(chain)) {
           const l1GasFee = await wallet.fetchEstimatedL1Fee(
             {
               txParams: {
@@ -908,7 +932,12 @@ const SendToken = () => {
   };
 
   const handleClickBack = () => {
-    history.replace('/');
+    const from = (history.location.state as any)?.from;
+    if (from) {
+      history.replace(from);
+    } else {
+      history.replace('/');
+    }
   };
 
   const loadCurrentToken = async (
@@ -938,6 +967,27 @@ const SendToken = () => {
       }
       setChain(target.enum);
       loadCurrentToken(id, tokenChain, account.address);
+    } else if ((history.location.state as any)?.safeInfo) {
+      const safeInfo: {
+        nonce: number;
+        chainId: number;
+      } = (history.location.state as any)?.safeInfo;
+
+      const chain = findChainByID(safeInfo.chainId);
+      let nativeToken: TokenItem | null = null;
+      if (chain) {
+        setChain(chain.enum);
+        nativeToken = await loadCurrentToken(
+          chain.nativeTokenAddress,
+          chain.serverId,
+          account.address
+        );
+      }
+      setSafeInfo(safeInfo);
+      persistPageStateCache({
+        safeInfo,
+        currentToken: nativeToken || currentToken,
+      });
     } else {
       let tokenFromOrder: TokenItem | null = null;
 
@@ -967,6 +1017,9 @@ const SendToken = () => {
           if (cache.states.currentToken) {
             setCurrentToken(cache.states.currentToken);
             needLoadToken = cache.states.currentToken;
+          }
+          if (cache.states.safeInfo) {
+            setSafeInfo(cache.states.safeInfo);
           }
         }
       }
@@ -1124,6 +1177,7 @@ const SendToken = () => {
               onChange={handleChainChanged}
               disabledTips={'Not supported'}
               supportChains={undefined}
+              readonly={!!safeInfo}
             />
             <div className={clsx('section-title mt-[10px]')}>
               {t('page.sendToken.sectionFrom.title')}
@@ -1151,7 +1205,10 @@ const SendToken = () => {
                   >
                     {contactInfo && (
                       <>
-                        <img src={IconEdit} className="icon icon-edit" />
+                        <ThemeIcon
+                          src={RcIconEdit}
+                          className="icon icon-edit"
+                        />
                         <span
                           title={contactInfo.name}
                           className="inline-block align-middle truncate max-w-[240px]"
@@ -1162,9 +1219,9 @@ const SendToken = () => {
                     )}
                   </div>
                 )}
-                <img
+                <ThemeIcon
                   className="icon icon-contact"
-                  src={whitelistEnabled ? IconWhitelist : IconContact}
+                  src={whitelistEnabled ? RcIconWhitelist : RcIconContact}
                   onClick={handleListContact}
                 />
               </div>
@@ -1211,13 +1268,14 @@ const SendToken = () => {
                 />
               </Form.Item>
               {toAddressIsValid && !toAddressInContactBook && (
-                <div className="tip-no-contact font-normal text-[12px] pt-[12px]">
+                <div className="tip-no-contact font-normal text-[12px] text-r-neutral-body pt-[12px]">
                   <Trans i18nKey="page.sendToken.addressNotInContract" t={t}>
                     Not on address list.{' '}
                     <span
                       onClick={handleClickAddContact}
-                      className={clsx('ml-[2px] underline cursor-pointer')}
-                      style={{ color: 'var(--r-blue-default, #7084ff)' }}
+                      className={clsx(
+                        'ml-[2px] underline cursor-pointer text-r-blue-default'
+                      )}
                     >
                       Add to contacts
                     </span>
@@ -1286,7 +1344,6 @@ const SendToken = () => {
               )}
             </Form.Item>
             <div className="token-info">
-              <img className="token-info__header" src={TokenInfoArrow} />
               {!isNativeToken ? (
                 <div className="section-field">
                   <span>
@@ -1350,11 +1407,11 @@ const SendToken = () => {
             >
               <p className="whitelist-alert__content text-center">
                 {whitelistEnabled && (
-                  <img
+                  <ThemeIcon
                     src={
                       whitelistAlertContent.success
-                        ? IconCheck
-                        : IconTemporaryGrantCheckbox
+                        ? RcIconCheck
+                        : RcIconTemporaryGrantCheckbox
                     }
                     className="icon icon-check inline-block relative -top-1"
                   />

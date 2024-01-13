@@ -102,7 +102,9 @@ export const AddressDelete = ({
           </div>
         </div>
       </div>
-      {![KEYRING_TYPE.HdKeyring, KEYRING_TYPE.SimpleKeyring].includes(type) && (
+      {![KEYRING_TYPE.HdKeyring, KEYRING_TYPE.SimpleKeyring].includes(
+        type as any
+      ) && (
         <AddressDeleteModal
           type={type}
           brandName={brandName}
@@ -150,6 +152,7 @@ const AddressDeleteModal = ({
       height={240}
       className="address-delete-modal"
       onClose={onClose}
+      isSupportDarkMode
     >
       <div className="desc">
         {t('page.addressDetail.direct-delete-desc', { renderBrand })}

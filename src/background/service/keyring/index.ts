@@ -2,9 +2,10 @@
 
 import { EventEmitter } from 'events';
 import log from 'loglevel';
-import encryptor from 'browser-passworder';
+import * as encryptor from '@metamask/browser-passworder';
 import * as ethUtil from 'ethereumjs-util';
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { ObservableStore } from '@metamask/obs-store';
 import {
   normalizeAddress,
@@ -21,9 +22,8 @@ import LatticeKeyring from './eth-lattice-keyring';
 import WatchKeyring from '@rabby-wallet/eth-watch-keyring';
 import KeystoneKeyring from './eth-keystone-keyring';
 import CoboArgusKeyring from './eth-cobo-argus-keyring';
-import WalletConnectKeyring, {
-  keyringType,
-} from '@rabby-wallet/eth-walletconnect-keyring';
+import { WalletConnectKeyring } from '@rabby-wallet/eth-walletconnect-keyring';
+import CoinbaseKeyring from '@rabby-wallet/eth-coinbase-keyring';
 import GnosisKeyring, {
   TransactionBuiltEvent,
   TransactionConfirmedEvent,
@@ -37,6 +37,7 @@ import { isSameAddress } from 'background/utils';
 import contactBook from '../contactBook';
 import { generateAliasName } from '@/utils/account';
 import * as Sentry from '@sentry/browser';
+import { GET_WALLETCONNECT_CONFIG } from '@/utils/walletconnect';
 
 export const KEYRING_SDK_TYPES = {
   SimpleKeyring,
@@ -51,6 +52,7 @@ export const KEYRING_SDK_TYPES = {
   LatticeKeyring,
   KeystoneKeyring,
   CoboArgusKeyring,
+  CoinbaseKeyring,
 };
 
 export const KEYRING_CLASS = {
@@ -68,6 +70,7 @@ export const KEYRING_CLASS = {
   GNOSIS: GnosisKeyring.type,
   QRCODE: KeystoneKeyring.type,
   COBO_ARGUS: CoboArgusKeyring.type,
+  COINBASE: CoinbaseKeyring.type,
 };
 
 interface MemStoreState {
@@ -188,7 +191,7 @@ export class KeyringService extends EventEmitter {
   }
 
   generateMnemonic(): string {
-    return bip39.generateMnemonic();
+    return bip39.generateMnemonic(wordlist);
   }
 
   async generatePreMnemonic(): Promise<string> {
@@ -238,7 +241,7 @@ export class KeyringService extends EventEmitter {
    * @returns {Promise<Object>} A Promise that resolves to the state.
    */
   createKeyringWithMnemonics(seed: string): Promise<any> {
-    if (!bip39.validateMnemonic(seed)) {
+    if (!bip39.validateMnemonic(seed, wordlist)) {
       return Promise.reject(
         new Error(i18n.t('background.error.invalidMnemonic'))
       );
@@ -733,38 +736,6 @@ export class KeyringService extends EventEmitter {
     return keyring.exportAccount(address, { withAppKeyOrigin: origin });
   }
 
-  //
-  // PRIVATE METHODS
-  //
-
-  /**
-   * Create First Key Tree
-   *
-   * - Clears the existing vault
-   * - Creates a new vault
-   * - Creates a random new HD Keyring with 1 account
-   * - Makes that account the selected account
-   * - Faucets that account on testnet
-   * - Puts the current seed words into the state tree
-   *
-   * @returns {Promise<void>} - A promise that resovles if the operation was successful.
-   */
-  createFirstKeyTree() {
-    this.clearKeyrings();
-    return this.addNewKeyring('HD Key Tree', { activeIndexes: [0] })
-      .then((keyring) => {
-        return keyring.getAccounts();
-      })
-      .then(([firstAccount]) => {
-        if (!firstAccount) {
-          throw new Error('KeyringController - No account found on keychain.');
-        }
-        const hexAccount = normalizeAddress(firstAccount);
-        this.emit('newVault', hexAccount);
-        return null;
-      });
-  }
-
   /**
    * Persist All Keyrings
    *
@@ -826,7 +797,9 @@ export class KeyringService extends EventEmitter {
     await this.clearKeyrings();
     const vault = await this.encryptor.decrypt(password, encryptedVault);
     // TODO: FIXME
-    await Promise.all(Array.from(vault).map(this._restoreKeyring.bind(this)));
+    await Promise.all(
+      Array.from(vault as any).map(this._restoreKeyring.bind(this))
+    );
     await this._updateMemStoreKeyrings();
     return this.keyrings;
   }
@@ -859,7 +832,10 @@ export class KeyringService extends EventEmitter {
   async _restoreKeyring(serialized: any): Promise<any> {
     const { type, data } = serialized;
     const Keyring = this.getKeyringClassForType(type);
-    const keyring = new Keyring();
+    const keyring =
+      Keyring?.type === KEYRING_CLASS.WALLETCONNECT
+        ? new Keyring(GET_WALLETCONNECT_CONFIG())
+        : new Keyring();
     await keyring.deserialize(data);
     if (
       keyring.type === HARDWARE_KEYRING_TYPES.Ledger.type &&
@@ -870,8 +846,12 @@ export class KeyringService extends EventEmitter {
     if (keyring.type === KEYRING_CLASS.WALLETCONNECT) {
       eventBus.addEventListener(
         EVENTS.WALLETCONNECT.INIT,
-        ({ address, brandName }) => {
-          (keyring as WalletConnectKeyring).init(address, brandName);
+        ({ address, brandName, chainId }) => {
+          (keyring as WalletConnectKeyring).init(
+            address,
+            brandName,
+            !chainId ? 1 : chainId
+          );
         }
       );
       (keyring as WalletConnectKeyring).on('inited', (uri) => {
@@ -924,6 +904,42 @@ export class KeyringService extends EventEmitter {
         Sentry.captureException(error);
       });
     }
+
+    if (keyring.type === KEYRING_CLASS.COINBASE) {
+      const coinbaseKeyring = keyring as CoinbaseKeyring;
+      eventBus.addEventListener(EVENTS.WALLETCONNECT.INIT, ({ address }) => {
+        const uri = coinbaseKeyring.connect({
+          address,
+        });
+
+        eventBus.emit(EVENTS.broadcastToUI, {
+          method: EVENTS.WALLETCONNECT.INITED,
+          params: { uri },
+        });
+      });
+
+      coinbaseKeyring.on('message', (data) => {
+        if (data.status === 'CHAIN_CHANGED') {
+          eventBus.emit(EVENTS.broadcastToUI, {
+            method: EVENTS.WALLETCONNECT.SESSION_ACCOUNT_CHANGED,
+            params: {
+              ...data,
+              status: 'CONNECTED',
+            },
+          });
+        } else {
+          eventBus.emit(EVENTS.broadcastToUI, {
+            method: EVENTS.WALLETCONNECT.SESSION_STATUS_CHANGED,
+            params: data,
+          });
+          eventBus.emit(EVENTS.broadcastToUI, {
+            method: EVENTS.WALLETCONNECT.SESSION_ACCOUNT_CHANGED,
+            params: data,
+          });
+        }
+      });
+    }
+
     if (keyring.type === KEYRING_CLASS.GNOSIS) {
       (keyring as GnosisKeyring).on(TransactionBuiltEvent, (data) => {
         eventBus.emit(EVENTS.broadcastToUI, {

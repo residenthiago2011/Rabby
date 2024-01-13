@@ -3,11 +3,13 @@
 .tx-history {
   display: flex;
   flex-direction: column;
+
   &__item {
     position: relative;
-    background: #ffffff;
+    background: var(--r-neutral-card-1, rgba(255, 255, 255, 0.06));
     border-radius: 6px;
     margin-bottom: 12px;
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.08);
     &--main {
       padding: 8px 12px 16px;
     }
@@ -18,7 +20,7 @@
       font-weight: 500;
       font-size: 15px;
       line-height: 18px;
-      color: @color-body;
+      color: var(--r-neutral-title-1, #F7FAFC);
       flex: 1;
       .icon-explain {
         width: 18px;
@@ -39,7 +41,7 @@
           display: none;
           margin-left: 6px;
           path {
-            fill: @color-comment-1;
+            fill: var(--r-neutral-foot, #BABEC5);
           }
         }
         &:hover {
@@ -54,26 +56,33 @@
       position: absolute;
       top: 0;
       left: 12px;
-      background-color: rgba(242, 156, 27, 0.2);
       border-radius: 0px 0px 4px 4px;
-      padding: 5px 10px;
+      background: var(--r-orange-light, #645D50);
+      padding: 4px 6px;
       display: flex;
       justify-content: center;
       align-items: center;
       font-size: 12px;
-      color: #f29c1b;
+      color: var(--r-orange-default, #FFC64A);
+      font-weight: 400;
+      line-height: 14px;
+      gap: 4px;
+
       .icon-pending-spin {
         width: 12px;
         height: 12px;
         animation: spining 1.5s infinite linear;
-        margin-right: 6px;
+
+        path {
+          fill: var(--r-orange-default, #FFC64A);
+        }
       }
     }
     .tx-id {
       display: flex;
       justify-content: space-between;
       font-size: 12px;
-      color: @color-comment-1;
+      color: var(--r-neutral-foot, #BABEC5);
       margin-bottom: 14px;
       line-height: 14px;
     }
@@ -106,6 +115,7 @@
     }
     .ahead {
       font-size: 12px;
+      line-height: 14px;
       color: #7f8a9a;
     }
     &--children {
@@ -114,7 +124,7 @@
       padding: 12px;
       font-size: 12px;
       line-height: 14px;
-      color: @color-comment-1;
+      color: var(--r-neutral-foot, #BABEC5);
       .pending-detail {
         display: flex;
         align-items: center;
@@ -131,7 +141,7 @@
         display: flex;
         margin-bottom: 10px;
         .tx-type {
-          width: 65px;
+          width: 95px;
         }
         .ahead {
           flex: 1;
@@ -141,7 +151,7 @@
         .icon-spin {
           animation: spining 1.5s infinite linear;
           path {
-            fill: @color-comment-1;
+            fill: var(--r-neutral-foot, #BABEC5);
           }
         }
         &:nth-last-child(1) {
@@ -150,7 +160,7 @@
       }
     }
   }
-  
+
   &__pending {
     .tx-history__item {
       .tx-footer {
@@ -204,7 +214,7 @@
 .bottom-view-all-transaction {
   display: flex;
   font-size: 12px;
-  color: @color-comment-1;
+  color: var(--r-neutral-foot, #BABEC5);
   align-items: center;
   white-space: nowrap;
   position: absolute;
@@ -213,14 +223,14 @@
   bottom: 0;
   font-weight: normal;
   &:hover {
-    color: @color-comment-1;
+    color: var(--r-neutral-foot, #BABEC5);
   }
   .icon-external {
     width: 12px;
     height: 12px;
     margin-left: 4px;
     path {
-      fill: @color-comment-1;
+      fill: var(--r-neutral-foot, #BABEC5);
     }
   }
 }
@@ -229,4 +239,20 @@
   justify-content: center;
   position: static;
   margin-top: 36px;
+}
+
+.mempool-list-popover {
+  padding-top: 3px;
+
+  .ant-popover-arrow {
+    display: none;
+  }
+  .ant-popover-inner-content {
+    padding: 0;
+  }
+  .ant-popover-inner {
+    border: 0.5px solid var(--r-neutral-line, rgba(255, 255, 255, 0.10));
+    background: var(--r-neutral-bg-1, #3D4251);
+    box-shadow: 0px 8px 24px 0px rgba(0, 0, 0, 0.25);
+  }
 }

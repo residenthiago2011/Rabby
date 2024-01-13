@@ -14,7 +14,9 @@ import {
   getActionTypeText,
   BatchApproveTokenRequireData,
 } from './utils';
-import IconArrowRight from 'ui/assets/approval/edit-arrow-right.svg';
+import IconArrowRight, {
+  ReactComponent as RcIconArrowRight,
+} from 'ui/assets/approval/edit-arrow-right.svg';
 import BuyNFT from './BuyNFT';
 import SellNFT from './SellNFT';
 import Permit from './Permit';
@@ -26,10 +28,19 @@ import CreateKey from '../TextActions/CreateKey';
 import VerifyAddress from '../TextActions/VerifyAddress';
 import BatchSellNFT from './BatchSellNFT';
 import BatchPermit2 from './BatchPermit2';
-import { ReactComponent as IconQuestionMark } from 'ui/assets/sign/tx/question-mark.svg';
 import { TooltipWithMagnetArrow } from '@/ui/component/Tooltip/TooltipWithMagnetArrow';
-import IconAlert from 'ui/assets/sign/tx/alert.svg';
+import IconQuestionMark from 'ui/assets/sign/question-mark-24.svg';
+import IconRabbyDecoded from 'ui/assets/sign/rabby-decoded.svg';
+import IconCheck, {
+  ReactComponent as RcIconCheck,
+} from 'src/ui/assets/approval/icon-check.svg';
 import clsx from 'clsx';
+import { NoActionAlert } from '../NoActionAlert/NoActionAlert';
+import ThemeIcon from '@/ui/component/ThemeMode/ThemeIcon';
+import CoboSafeCreate from './CoboSafeCreate';
+import CoboSafeModificationRule from './CoboSafeModificationRole';
+import CoboSafeModificationDelegatedAddress from './CoboSafeModificationDelegatedAddress';
+import CoboSafeModificationTokenApproval from './CoboSafeModificationTokenApproval';
 
 export const SignTitle = styled.div`
   display: flex;
@@ -39,7 +50,7 @@ export const SignTitle = styled.div`
     display: flex;
     font-size: 18px;
     line-height: 21px;
-    color: #333333;
+    color: var(--r-neutral-title-1, #f7fafc);
     .icon-speedup {
       width: 10px;
       margin-right: 6px;
@@ -57,12 +68,11 @@ export const SignTitle = styled.div`
 export const ActionWrapper = styled.div`
   border-radius: 8px;
   margin-bottom: 8px;
-  background-color: #fff;
   .action-header {
     display: flex;
     justify-content: space-between;
     background: var(--r-blue-default, #7084ff);
-    padding: 14px;
+    padding: 13px;
     align-items: center;
     color: #fff;
     border-top-left-radius: 8px;
@@ -75,17 +85,39 @@ export const ActionWrapper = styled.div`
     .right {
       font-size: 14px;
       line-height: 16px;
-      .icon-tip {
-        margin-top: 1px;
-        margin-left: 4px;
-        path {
-          stroke: #fff;
+      position: relative;
+      .decode-tooltip {
+        max-width: 358px;
+        &:not(.ant-tooltip-hidden) {
+          left: -321px !important;
+          .ant-tooltip-arrow {
+            left: 333px;
+          }
+        }
+        .ant-tooltip-arrow-content {
+          background-color: var(--r-neutral-bg-1, #fff);
+        }
+        .ant-tooltip-inner {
+          background-color: var(--r-neutral-bg-1, #fff);
+          padding: 0;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--r-neutral-body, #3e495e);
+          border-radius: 6px;
         }
       }
+    }
+    &.is-unknown {
+      background: var(--r-neutral-foot, #6a7587);
     }
   }
   .container {
     padding: 14px;
+    /* border: 0.5px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1)); */
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: var(--r-neutral-card-1, rgba(255, 255, 255, 0.06));
+
     .header {
       display: flex;
       justify-content: space-between;
@@ -105,30 +137,12 @@ export const ActionWrapper = styled.div`
   }
 `;
 
-const NoActionAlert = styled.div`
-  display: flex;
-  align-items: flex-start;
-  background: #e8eaf3;
-  border-radius: 6px;
-  padding: 15px;
-  font-weight: 500;
-  font-size: 13px;
-  line-height: 18px;
-  color: #333333;
-  margin-bottom: 15px;
-  .icon-alert {
-    margin-right: 8px;
-    width: 15px;
-    margin-top: 1px;
-  }
-`;
-
 const MessageWrapper = styled.div`
   .title {
     position: relative;
     font-size: 14px;
     line-height: 16px;
-    color: #666666;
+    color: var(--r-neutral-title-1, #f7fafc);
     text-align: center;
     margin-bottom: 10px;
     margin-left: -20px;
@@ -137,7 +151,7 @@ const MessageWrapper = styled.div`
       content: '';
       width: 40%;
       height: 1px;
-      border-top: 1px dashed #c7c9d7;
+      border-top: 1px dashed var(--r-neutral-line, rgba(255, 255, 255, 0.1));
       position: absolute;
       top: 50%;
       left: 0;
@@ -146,7 +160,7 @@ const MessageWrapper = styled.div`
       content: '';
       width: 40%;
       height: 1px;
-      border-top: 1px dashed #c7c9d7;
+      border-top: 1px dashed var(--r-neutral-line, rgba(255, 255, 255, 0.1));
       position: absolute;
       top: 50%;
       right: 0;
@@ -156,20 +170,20 @@ const MessageWrapper = styled.div`
     padding: 15px;
     word-break: break-all;
     white-space: pre-wrap;
-    background: #ebedf7;
-    border: 1px solid rgba(225, 227, 234, 0.9);
+    background: var(--r-neutral-card-1, #ffffff);
+    border: 1px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1));
     border-radius: 6px;
     font-size: 13px;
     line-height: 16px;
     font-weight: 500;
-    color: #4b4d59;
+    color: var(--r-neutral-body, #3e495e);
     height: 320px;
     overflow-y: auto;
     /* font-family: 'Roboto Mono'; */
   }
   &.no-action {
     .content {
-      background-color: #fff;
+      background: var(--r-neutral-card-3, rgba(255, 255, 255, 0.06));
     }
   }
 `;
@@ -181,6 +195,7 @@ const Actions = ({
   engineResults,
   raw,
   message,
+  origin,
 }: {
   data: TypedDataActionData | null;
   requireData: TypedDataRequireData;
@@ -188,11 +203,11 @@ const Actions = ({
   engineResults: Result[];
   raw: Record<string, any>;
   message: string;
+  origin: string;
 }) => {
   const { t } = useTranslation();
 
   const actionName = useMemo(() => {
-    if (!data) return '';
     return getActionTypeText(data);
   }, [data]);
 
@@ -201,7 +216,6 @@ const Actions = ({
       raw,
     });
   };
-
   return (
     <>
       <SignTitle>
@@ -215,28 +229,58 @@ const Actions = ({
           onClick={handleViewRawClick}
         >
           {t('page.signTx.viewRaw')}
-          <img className="icon icon-arrow-right" src={IconArrowRight} />
+          <ThemeIcon className="icon icon-arrow-right" src={RcIconArrowRight} />
         </div>
       </SignTitle>
-      {data?.actionType && (
-        <ActionWrapper>
-          <div className="action-header">
-            <div className="left">{actionName}</div>
-            <div className="right">
-              {data.contractCall && (
-                <span className="flex items-center relative">
-                  {t('page.signTx.unknownActionType')}{' '}
-                  <TooltipWithMagnetArrow
-                    overlayClassName="rectangle w-[max-content]"
-                    title={t('page.signTx.sigCantDecode')}
-                    placement="top"
-                  >
-                    <IconQuestionMark className="icon icon-tip" />
-                  </TooltipWithMagnetArrow>
-                </span>
-              )}
-            </div>
+
+      <ActionWrapper>
+        <div
+          className={clsx('action-header', {
+            'is-unknown': !data?.actionType || data.contractCall,
+          })}
+        >
+          <div className="left flex items-center">
+            {data?.brand ? (
+              <img
+                src={data?.brand?.logo_url}
+                title={data?.brand?.name}
+                className="mr-8 w-20 h-20 rounded-full object-cover"
+              />
+            ) : null}
+            <span>{actionName}</span>
           </div>
+          <div className="right">
+            <TooltipWithMagnetArrow
+              placement="bottom"
+              overlayClassName="rectangle w-[max-content] decode-tooltip"
+              title={
+                !data?.actionType || data?.contractCall ? (
+                  <NoActionAlert
+                    data={{
+                      origin,
+                      text: message,
+                    }}
+                  />
+                ) : (
+                  <span className="flex w-[358px] p-12 items-center">
+                    <ThemeIcon src={RcIconCheck} className="mr-4 w-12" />
+                    {t('page.signTx.decodedTooltip')}
+                  </span>
+                )
+              }
+            >
+              {!data?.actionType || data?.contractCall ? (
+                <img src={IconQuestionMark} className="w-24" />
+              ) : (
+                <img
+                  src={IconRabbyDecoded}
+                  className="icon icon-rabby-decoded"
+                />
+              )}
+            </TooltipWithMagnetArrow>
+          </div>
+        </div>
+        {data?.actionType && (
           <div className="container">
             {data.permit && chain && (
               <Permit
@@ -323,16 +367,25 @@ const Actions = ({
                 raw={raw}
               />
             )}
+            {data.coboSafeCreate && (
+              <CoboSafeCreate data={data.coboSafeCreate} />
+            )}
+            {data.coboSafeModificationRole && (
+              <CoboSafeModificationRule data={data.coboSafeModificationRole} />
+            )}
+            {data.coboSafeModificationDelegatedAddress && (
+              <CoboSafeModificationDelegatedAddress
+                data={data.coboSafeModificationDelegatedAddress}
+              />
+            )}
+            {data.coboSafeModificationTokenApproval && (
+              <CoboSafeModificationTokenApproval
+                data={data.coboSafeModificationTokenApproval}
+              />
+            )}
           </div>
-        </ActionWrapper>
-      )}
-      {(!data || !data.actionType) && (
-        <NoActionAlert>
-          <img src={IconAlert} className="icon icon-alert" />
-          This signature can't be decoded by Rabby, but it doesn't imply any
-          risk
-        </NoActionAlert>
-      )}
+        )}
+      </ActionWrapper>
       <MessageWrapper
         className={clsx({
           'no-action': !data,

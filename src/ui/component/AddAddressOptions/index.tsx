@@ -1,16 +1,34 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { openInternalPageInTab } from 'ui/utils/webapi';
-import IconWalletConnect from 'ui/assets/walletlogo/walletconnect.svg';
-import IconCreatenewaddr from 'ui/assets/walletlogo/createnewaddr.svg';
-import IconAddwatchmodo from 'ui/assets/walletlogo/addwatchmode.svg';
-import IconHardWallet from 'ui/assets/address/hardwallet.svg';
-import IconMobileWallet from 'ui/assets/address/mobile-wallet.svg';
-import InstitutionalWallet from 'ui/assets/address/institutional-wallet.svg';
-import IconMetamask from 'ui/assets/dashboard/icon-metamask.svg';
-import IconMnemonics from 'ui/assets/import/mnemonics-light.svg';
-import IconPrivatekey from 'ui/assets/import/privatekey-light.svg';
+import IconWalletConnect, {
+  ReactComponent as RcIconWalletConnect,
+} from 'ui/assets/walletlogo/walletconnect.svg';
+import IconCreatenewaddr, {
+  ReactComponent as RcIconCreatenewaddr,
+} from 'ui/assets/walletlogo/createnewaddr.svg';
+import IconAddwatchmodo, {
+  ReactComponent as RcIconAddwatchmodo,
+} from 'ui/assets/walletlogo/addwatchmode.svg';
+import IconHardWallet, {
+  ReactComponent as RcIconHardWallet,
+} from 'ui/assets/address/hardwallet.svg';
+import IconMobileWallet, {
+  ReactComponent as RcIconMobileWallet,
+} from 'ui/assets/address/mobile-wallet.svg';
+import InstitutionalWallet, {
+  ReactComponent as RcInstitutionalWallet,
+} from 'ui/assets/address/institutional-wallet.svg';
+import IconMetamask, {
+  ReactComponent as RcIconMetamask,
+} from 'ui/assets/dashboard/icon-metamask.svg';
+import IconMnemonics, {
+  ReactComponent as RcIconMnemonics,
+} from 'ui/assets/import/mnemonics-light.svg';
+import IconPrivatekey, {
+  ReactComponent as RcIconPrivatekey,
+} from 'ui/assets/import/privatekey-light.svg';
 
 import './style.less';
 
@@ -30,13 +48,14 @@ import { connectStore } from '@/ui/store';
 import { Item } from '../Item';
 import { useWallet } from '@/ui/utils';
 import { Modal } from 'antd';
+import ThemeIcon from '../ThemeMode/ThemeIcon';
 
 const getSortNum = (s: string) => WALLET_SORT_SCORE[s] || 999999;
 
 const AddAddressOptions = () => {
   const history = useHistory();
   const { t } = useTranslation();
-
+  const location = useLocation();
   const wallet = useWallet();
 
   const [selectedWalletType, setSelectedWalletType] = useState('');
@@ -91,7 +110,7 @@ const AddAddressOptions = () => {
         okText: t('global.ok'),
         centered: true,
         maskClosable: true,
-        className: 'text-center',
+        className: 'text-center modal-support-darkmode',
       });
       return false;
     }
@@ -101,7 +120,14 @@ const AddAddressOptions = () => {
 
   type Valueof<T> = T[keyof T];
   const connectRouter1 = React.useCallback(
-    (history, item: Valueof<typeof WALLET_BRAND_CONTENT>) => {
+    (
+      history,
+      item: Valueof<typeof WALLET_BRAND_CONTENT>,
+      params?: {
+        address: string;
+        chainId: number;
+      }
+    ) => {
       if (item.connectType === 'BitBox02Connect') {
         openInternalPageInTab('import/hardware?connectType=BITBOX02');
       } else if (item.connectType === 'GridPlusConnect') {
@@ -123,6 +149,14 @@ const AddAddressOptions = () => {
       } else if (item.connectType === BRAND_WALLET_CONNECT_TYPE.QRCodeBase) {
         checkQRBasedWallet(item).then((success) => {
           if (!success) return;
+          /**
+           * Check if the wallet brand is Keystone. Although Keystone supports both USB signing and import,
+           * due to its dual-mode (QR and USB) design, it is still limited to import only one QR wallet at a time.
+           */
+          if (item.brand === WALLET_BRAND_TYPES.KEYSTONE) {
+            openInternalPageInTab('import/hardware/keystone');
+            return;
+          }
           openInternalPageInTab(`import/hardware/qrcode?brand=${item.brand}`);
         });
       } else if (
@@ -130,6 +164,14 @@ const AddAddressOptions = () => {
       ) {
         history.push({
           pathname: '/import/cobo-argus',
+          state: params,
+        });
+      } else if (
+        item.connectType === BRAND_WALLET_CONNECT_TYPE.CoinbaseConnect
+      ) {
+        history.push({
+          pathname: '/import/coinbase',
+          state: params,
         });
       } else {
         history.push({
@@ -142,8 +184,13 @@ const AddAddressOptions = () => {
     },
     []
   );
-  const connectRouter = (item: Valueof<typeof WALLET_BRAND_CONTENT>) =>
-    handleRouter((h) => connectRouter1(h, item));
+  const connectRouter = (
+    item: Valueof<typeof WALLET_BRAND_CONTENT>,
+    params?: {
+      address: string;
+      chainId: number;
+    }
+  ) => handleRouter((h) => connectRouter1(h, item, params));
   const brandWallet = React.useMemo(
     () =>
       (Object.values(WALLET_BRAND_CONTENT)
@@ -175,17 +222,17 @@ const AddAddressOptions = () => {
         {
           title: t('page.newAddress.connectHardwareWallets'),
           key: WALLET_BRAND_CATEGORY.HARDWARE,
-          icon: IconHardWallet,
+          icon: RcIconHardWallet,
         },
         {
           title: t('page.newAddress.connectMobileWalletApps'),
           key: WALLET_BRAND_CATEGORY.MOBILE,
-          icon: IconMobileWallet,
+          icon: RcIconMobileWallet,
         },
         {
           title: t('page.newAddress.connectInstitutionalWallets'),
           key: WALLET_BRAND_CATEGORY.INSTITUTIONAL,
-          icon: InstitutionalWallet,
+          icon: RcInstitutionalWallet,
         },
       ]
         .map((item) => {
@@ -198,7 +245,7 @@ const AddAddressOptions = () => {
     [wallets]
   );
 
-  const createIMportAddrList = React.useMemo(
+  const createImportAddrList = React.useMemo(
     () => [
       {
         leftIcon: IconCreatenewaddr,
@@ -252,14 +299,46 @@ const AddAddressOptions = () => {
     [t]
   );
 
+  const [preventMount, setPreventMount] = React.useState(true);
+  React.useEffect(() => {
+    if (location.state) {
+      const { type, address, chainId } = location.state as any;
+      const brandContentKey = Object.keys(WALLET_BRAND_CONTENT).find((key) => {
+        const item = WALLET_BRAND_CONTENT[key] as IWalletBrandContent;
+        return item.name === type;
+      });
+
+      if (brandContentKey) {
+        connectRouter(WALLET_BRAND_CONTENT[brandContentKey], {
+          address,
+          chainId,
+        });
+      } else {
+        setPreventMount(false);
+      }
+    } else {
+      setPreventMount(false);
+    }
+  }, [location.state, connectRouter]);
+
+  if (preventMount) return null;
+
   return (
     <div className="rabby-container pb-[12px]" ref={rootRef}>
-      {[createIMportAddrList, centerList].map((items, index) => (
-        <div className="bg-white rounded-[6px] mb-[12px]" key={index}>
+      {[createImportAddrList, centerList].map((items, index) => (
+        <div
+          className="bg-r-neutral-card-1 rounded-[6px] mb-[12px]"
+          key={index}
+        >
           {items.map((e) => {
             return (
-              <Item key={e.brand} leftIcon={e.leftIcon} onClick={e.onClick}>
-                <div className="pl-[12px] text-13 leading-[15px] text-gray-title font-medium">
+              <Item
+                key={e.brand}
+                bgColor="transparent"
+                leftIcon={e.leftIcon}
+                onClick={e.onClick}
+              >
+                <div className="pl-[12px] text-13 leading-[15px] text-r-neutral-title-1 font-medium">
                   {e.content}
                 </div>
               </Item>
@@ -268,13 +347,14 @@ const AddAddressOptions = () => {
         </div>
       ))}
 
-      <div className="bg-white rounded-[6px] mb-[12px]">
+      <div className="bg-r-neutral-card-1 rounded-[6px] mb-[12px]">
         {renderList.map((item) => {
           const isSelected = selectedWalletType === item.key;
           return (
             <div key={item.key} className={clsx(isSelected && 'pb-[16px]')}>
               <Item
                 hoverBorder={false}
+                bgColor="transparent"
                 leftIcon={item.icon}
                 className={clsx('bg-transparent', item.key)}
                 rightIconClassName={clsx(
@@ -287,12 +367,12 @@ const AddAddressOptions = () => {
                   );
                 }}
               >
-                <div className="pl-[12px] text-13 leading-[15px] text-gray-title font-medium">
+                <div className="pl-[12px] text-13 leading-[15px] text-r-neutral-title-1 font-medium">
                   {item.title}
                 </div>
                 <div className="ml-auto relative w-[52px] h-[20px]">
                   {item.values.slice(0, 3).map((wallet, i) => (
-                    <img
+                    <ThemeIcon
                       key={wallet.image}
                       src={wallet.leftIcon || wallet.image}
                       className="absolute top-0 w-[20px] h-[20px] select-none"
@@ -306,7 +386,7 @@ const AddAddressOptions = () => {
               </Item>
               <div
                 className={clsx(
-                  'mx-[16px] bg-gray-bg2 rounded-[6px] transition-all  overflow-hidden',
+                  'mx-[16px] bg-r-neutral-card-2 rounded-[6px] transition-all overflow-hidden',
                   !isSelected ? 'max-h-0' : 'max-h-[500px]'
                 )}
               >
@@ -321,10 +401,7 @@ const AddAddressOptions = () => {
                         key={v.brand}
                         left={
                           <div className="relative w-[28px] h-[28px]">
-                            <img
-                              src={v.image}
-                              className="w-[28px] h-[28px] rounded-full"
-                            />
+                            <img src={v.image} className="w-[28px] h-[28px]" />
                             {v.connectType === 'WalletConnect' &&
                               v.brand !== WALLET_BRAND_TYPES.WALLETCONNECT && (
                                 <img
@@ -337,7 +414,7 @@ const AddAddressOptions = () => {
                         rightIcon={null}
                         onClick={v.onClick}
                       >
-                        <span className="text-12 font-medium text-gray-title mt-[8px]">
+                        <span className="text-12 font-medium text-r-neutral-title-1 mt-[8px]">
                           {v.content}
                         </span>
                       </Item>
@@ -350,15 +427,20 @@ const AddAddressOptions = () => {
         })}
       </div>
 
-      <div className="bg-white rounded-[6px]">
+      <div className="bg-r-neutral-card-1 rounded-[6px]">
         {bottomList.map((e) => {
           return (
-            <Item key={e.brand} leftIcon={e.leftIcon} onClick={e.onClick}>
+            <Item
+              bgColor="transparent"
+              key={e.brand}
+              leftIcon={e.leftIcon}
+              onClick={e.onClick}
+            >
               <div className="flex flex-col pl-[12px]">
-                <div className=" text-13 leading-[15px] text-gray-title font-medium">
+                <div className="text-13 leading-[15px] text-r-neutral-title-1 font-medium">
                   {e.content}
                 </div>
-                <div className="text-12 text-gray-subTitle">{e.subText}</div>
+                <div className="text-12 text-r-neutral-body">{e.subText}</div>
               </div>
             </Item>
           );

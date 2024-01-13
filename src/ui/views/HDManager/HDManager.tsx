@@ -17,12 +17,13 @@ import { QRCodeManager } from './QRCodeManager';
 import { ReactComponent as TrezorSVG } from 'ui/assets/walletlogo/trezor.svg';
 import { ReactComponent as OneKeySVG } from 'ui/assets/walletlogo/onekey.svg';
 import { ReactComponent as LedgerSVG } from 'ui/assets/walletlogo/ledger.svg';
-import { ReactComponent as MnemonicSVG } from '@/ui/assets/walletlogo/mnemonic-ink.svg';
+import { ReactComponent as RcMnemonicSVG } from '@/ui/assets/walletlogo/mnemonic-ink-cc.svg';
 import { ReactComponent as GridPlusSVG } from '@/ui/assets/walletlogo/gridplus.svg';
 import KeyStoneSVG from '@/ui/assets/walletlogo/keystone.svg';
 import { ReactComponent as AirGapSVG } from '@/ui/assets/walletlogo/airgap.svg';
 import { ReactComponent as CoolWalletSVG } from '@/ui/assets/walletlogo/coolwallet.svg';
 import { ReactComponent as BitBox02SVG } from '@/ui/assets/walletlogo/bitbox02.svg';
+import { ReactComponent as imtokenOfflineSVG } from '@/ui/assets/walletlogo/imTokenOffline.svg';
 import { BitBox02Manager } from './BitBox02Manager';
 import { useTranslation } from 'react-i18next';
 
@@ -30,12 +31,13 @@ const LOGO_MAP = {
   [HARDWARE_KEYRING_TYPES.Ledger.type]: LedgerSVG,
   [HARDWARE_KEYRING_TYPES.Trezor.type]: TrezorSVG,
   [HARDWARE_KEYRING_TYPES.Onekey.type]: OneKeySVG,
-  [KEYRING_CLASS.MNEMONIC]: MnemonicSVG,
+  [KEYRING_CLASS.MNEMONIC]: RcMnemonicSVG,
   [HARDWARE_KEYRING_TYPES.GridPlus.type]: GridPlusSVG,
   [WALLET_BRAND_TYPES.KEYSTONE]: KeyStoneSVG,
   [WALLET_BRAND_TYPES.AIRGAP]: AirGapSVG,
   [WALLET_BRAND_TYPES.COOLWALLET]: CoolWalletSVG,
   [HARDWARE_KEYRING_TYPES.BitBox02.type]: BitBox02SVG,
+  [WALLET_BRAND_TYPES.IMTOKENOFFLINE]: imtokenOfflineSVG,
 };
 
 const MANAGER_MAP = {
@@ -76,7 +78,9 @@ export const HDManager: React.FC<StateProviderProps> = ({
       'page.newAddress.hd.manageGridplus'
     ),
     [WALLET_BRAND_TYPES.KEYSTONE]: t('page.newAddress.hd.manageKeystone'),
-    [WALLET_BRAND_TYPES.AIRGAP]: t('page.newAddress.hd.manageAirgap'),
+    [WALLET_BRAND_TYPES.IMTOKENOFFLINE]: t(
+      'page.newAddress.hd.manageImtokenOffline'
+    ),
     [WALLET_BRAND_TYPES.COOLWALLET]: t('page.newAddress.hd.manageCoolwallet'),
     [HARDWARE_KEYRING_TYPES.BitBox02.type]: t(
       'page.newAddress.hd.manageBitbox02'
@@ -148,7 +152,7 @@ export const HDManager: React.FC<StateProviderProps> = ({
             {typeof Logo === 'string' ? (
               <img src={Logo} className="icon" />
             ) : (
-              <Logo className="icon" viewBox="0 0 28px 28px" />
+              <Logo className="icon text-r-neutral-body" viewBox="0 0 28 28" />
             )}
             <span className="title">{name}</span>
           </div>

@@ -1,15 +1,7 @@
 import { CHAINS } from '@/constant';
 import { keyBy } from 'lodash';
-import { browser } from 'webextension-polyfill-ts';
+import browser from 'webextension-polyfill';
 import { ledgerUSBVendorId } from '@ledgerhq/devices';
-
-import BroadcastChannelMessage from './message/broadcastChannelMessage';
-import PortMessage from './message/portMessage';
-
-const Message = {
-  BroadcastChannelMessage,
-  PortMessage,
-};
 
 declare global {
   const langLocales: Record<string, Record<'message', string>>;
@@ -21,7 +13,7 @@ const format = (str, ...args) => {
   return args.reduce((m, n) => m.replace('_s_', n), str);
 };
 
-export { Message, t, format };
+export { t, format };
 
 const chainsDict = keyBy(CHAINS, 'serverId');
 export const getChain = (chainId?: string) => {
@@ -63,4 +55,11 @@ export const getMainDomain = (url: string) => {
 
 export const resemblesETHAddress = (str: string): boolean => {
   return str.length === 42;
+};
+
+export const getAddressScanLink = (scanLink: string, address: string) => {
+  if (/transaction\/_s_/.test(scanLink)) {
+    return scanLink.replace(/transaction\/_s_/, `address/${address}`);
+  }
+  return scanLink.replace(/tx\/_s_/, `address/${address}`);
 };

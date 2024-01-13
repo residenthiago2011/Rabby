@@ -11,6 +11,7 @@ import * as Sentry from '@sentry/browser';
 import { HARDWARE_KEYRING_TYPES, WALLET_BRAND_CONTENT } from 'consts';
 import QRCodeCheckerDetail from 'ui/views/QRCodeCheckerDetail';
 import clsx from 'clsx';
+import Progress from '@/ui/component/Progress';
 
 type Valueof<T> = T[keyof T];
 
@@ -36,6 +37,8 @@ export const QRCodeConnect = () => {
   const brandInfo: Valueof<typeof WALLET_BRAND_CONTENT> =
     WALLET_BRAND_CONTENT[brand] || WALLET_BRAND_CONTENT.Keystone;
 
+  const [progress, setProgress] = useState(0);
+
   const showErrorChecker = useMemo(() => {
     return errorMessage !== '';
   }, [errorMessage]);
@@ -43,6 +46,7 @@ export const QRCodeConnect = () => {
   const handleScanQRCodeSuccess = async (data) => {
     try {
       decoder.current.receivePart(data);
+      setProgress(Math.floor(decoder.current.estimatedPercentComplete() * 100));
       if (decoder.current.isComplete()) {
         const result = decoder.current.resultUR();
         if (result.type === 'crypto-hdkey') {
@@ -134,18 +138,22 @@ export const QRCodeConnect = () => {
   const handleScan = () => {
     setErrorMessage('');
     setScan(true);
+    setProgress(0);
+    decoder.current = new URDecoder();
   };
   return (
-    <div className="bg-gray-bg2 h-full flex">
+    <div className="bg-r-neutral-bg1 h-full flex">
       <main
         className={clsx(
-          'bg-white rounded-[12px]',
+          'bg-r-neutral-card2 rounded-[12px]',
           'm-auto w-[1000px] h-[750px]',
           'py-[40px]'
         )}
       >
-        <div className="font-medium text-gray-title text-center">
-          <h1 className="text-[28px] leading-[33px]">{brandInfo.name}</h1>
+        <div className="font-medium text-r-neutral-body text-center">
+          <h1 className="text-[28px] leading-[33px] text-r-neutral-title1">
+            {brandInfo.name}
+          </h1>
           <p className="text-15 opacity-80 mt-16">
             Scan the QR code on the {brandInfo.name} hardware wallet
           </p>
@@ -156,9 +164,9 @@ export const QRCodeConnect = () => {
         <div className="mt-[60px]">
           <div
             className={clsx(
-              'm-auto rounded-[10px] p-[16px] bg-white',
+              'm-auto rounded-[10px] p-[16px] bg-transparent',
               'w-[320px] h-[320px]',
-              'border border-[#0000001A]'
+              'border border-rabby-neutral-line'
             )}
           >
             {scan && (
@@ -167,9 +175,16 @@ export const QRCodeConnect = () => {
                 height={288}
                 onSuccess={handleScanQRCodeSuccess}
                 onError={handleScanQRCodeError}
+                className="bg-r-neutral-line"
               />
             )}
           </div>
+
+          {progress > 0 && (
+            <div className="mt-[24px] m-auto w-[130px]">
+              <Progress percent={progress} />
+            </div>
+          )}
 
           {showErrorChecker && (
             <QRCodeCheckerDetail

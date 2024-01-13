@@ -8,13 +8,16 @@ import { useRabbyDispatch, useRabbySelector } from '@/ui/store';
 import { KEYRING_CLASS } from '@/constant';
 import { sortAccountsByBalance } from '@/ui/utils/account';
 import useDebounceValue from '@/ui/hooks/useDebounceValue';
+import { useThemeMode } from '@/ui/hooks/usePreference';
+import cx from 'clsx';
 
 import AddressItem from './AddressItem';
 
 import './index.less';
 import type { IDisplayedAccountWithBalance } from '@/ui/models/accountToDisplay';
-import LessPalette from '@/ui/style/var-defs';
 import { useTranslation } from 'react-i18next';
+import { ReactComponent as RcNoMatchedAddress } from '@/ui/assets/address/no-matched-addr.svg';
+import ThemeIcon from '../ThemeMode/ThemeIcon';
 
 function useSearchAccount(searchKeyword?: string) {
   const {
@@ -124,15 +127,8 @@ function NoSearchedAddressUI() {
   const { t } = useTranslation();
   return (
     <div className="no-matched-address h-[120px]">
-      <img
-        className="w-[28px] h-[28px]"
-        src="/images/no-matched-addr.svg"
-        alt="no address"
-      />
-      <p
-        className="text-13 mt-[10px]"
-        style={{ color: LessPalette['@color-body'] }}
-      >
+      <ThemeIcon className="w-[28px] h-[28px]" src={RcNoMatchedAddress} />
+      <p className="text-13 mt-[10px] text-r-neutral-body">
         {t('component.AccountSearchInput.noMatchAddress')}
       </p>
     </div>
@@ -157,6 +153,7 @@ const AccountSearchInput = React.forwardRef<any, AccountSearchInputProps>(
     const { filteredAccounts, noAnySearchedAccount } = useSearchAccount(
       searchKeyword
     );
+    const { isDarkTheme } = useThemeMode();
 
     const [inputFocusing, setInputFocusing] = useState(false);
 
@@ -181,7 +178,9 @@ const AccountSearchInput = React.forwardRef<any, AccountSearchInputProps>(
           visible={!!searchKeyword && !isInputAddrLike && inputFocusing}
           placement="bottom"
           className="account-search-popover-input"
-          overlayClassName="account-search-input-overlay"
+          overlayClassName={cx('account-search-input-overlay', {
+            'dark-mode': isDarkTheme,
+          })}
           align={{
             targetOffset: [0, 10],
           }}

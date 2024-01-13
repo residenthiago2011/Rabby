@@ -1,4 +1,4 @@
-import React, { useMemo, ReactNode } from 'react';
+import React, { useMemo, ReactNode, useState, useEffect } from 'react';
 import { message } from 'antd';
 import styled from 'styled-components';
 import ClipboardJS from 'clipboard';
@@ -7,7 +7,7 @@ import { Chain, TokenItem } from 'background/service/openapi';
 import AddressMemo from './AddressMemo';
 import userDataDrawer from './UserListDrawer';
 import { CHAINS } from 'consts';
-import { useWallet } from 'ui/utils';
+import { isSameAddress, useWallet } from 'ui/utils';
 import { getTimeSpan } from 'ui/utils/time';
 import { useRabbyDispatch } from 'ui/store';
 import { formatUsdValue, formatAmount } from 'ui/utils/number';
@@ -24,6 +24,8 @@ import IconExternal from 'ui/assets/icon-share.svg';
 import IconInteracted from 'ui/assets/sign/tx/interacted.svg';
 import IconNotInteracted from 'ui/assets/sign/tx/not-interacted.svg';
 import { TooltipWithMagnetArrow } from '@/ui/component/Tooltip/TooltipWithMagnetArrow';
+import AccountAlias from '../../AccountAlias';
+import { getAddressScanLink } from '@/utils';
 
 const Boolean = ({ value }: { value: boolean }) => {
   return <>{value ? 'Yes' : 'No'}</>;
@@ -298,7 +300,7 @@ const Address = ({
   const { t } = useTranslation();
   const handleClickContractId = () => {
     if (!chain) return;
-    openInTab(chain.scanLink.replace(/tx\/_s_/, `address/${address}`), false);
+    openInTab(getAddressScanLink(chain.scanLink, address), false);
   };
   const handleCopyContractAddress = () => {
     const clipboard = new ClipboardJS('.value-address', {
@@ -428,6 +430,34 @@ const TokenSymbol = ({ token }: { token: TokenItem }) => {
   );
 };
 
+const KnownAddress = ({ address }: { address: string }) => {
+  const wallet = useWallet();
+  const [hasAddress, setHasAddress] = useState(false);
+  const [inWhitelist, setInWhitelist] = useState(false);
+  const { t } = useTranslation();
+
+  const handleAddressChange = async (addr: string) => {
+    const res = await wallet.hasAddress(addr);
+    const whitelist = await wallet.getWhitelist();
+    setInWhitelist(!!whitelist.find((item) => isSameAddress(item, addr)));
+    setHasAddress(res);
+  };
+
+  useEffect(() => {
+    handleAddressChange(address);
+  }, [address]);
+
+  if (!hasAddress) return null;
+
+  return (
+    <span className="text-13">
+      {inWhitelist
+        ? t('page.connect.onYourWhitelist')
+        : t('page.signTx.importedAddress')}
+    </span>
+  );
+};
+
 export {
   Boolean,
   TokenAmount,
@@ -445,4 +475,6 @@ export {
   Interacted,
   Transacted,
   TokenSymbol,
+  AccountAlias,
+  KnownAddress,
 };

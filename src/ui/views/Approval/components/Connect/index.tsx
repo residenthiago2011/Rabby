@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from '@/i18n';
 import { Chain } from 'background/service/openapi';
 import { ChainSelector, Spin, FallbackSiteLogo } from 'ui/component';
-import { useApproval, useWallet } from 'ui/utils';
+import { useApproval, useCommonPopupView, useWallet } from 'ui/utils';
 import {
   CHAINS_ENUM,
   CHAINS,
@@ -27,6 +27,7 @@ import UserListDrawer from './UserListDrawer';
 import IconSuccess from 'ui/assets/success.svg';
 import PQueue from 'p-queue';
 import { SignTestnetPermission } from './SignTestnetPermission';
+import { ReactComponent as ArrowDownSVG } from '@/ui/assets/approval/arrow-down-blue.svg';
 
 interface ConnectProps {
   params: any;
@@ -44,14 +45,16 @@ const ConnectWrapper = styled.div`
       font-weight: 500;
       font-size: 17px;
       line-height: 20px;
-      color: #13141a;
+      color: var(--r-neutral-title-1, #192945);
     }
     .chain-selector {
       height: 32px;
       border-radius: 8px;
-      background: #fff;
+      background: var(--r-neutral-bg-1, #fff);
+      color: var(--r-neutral-title-1, #192945);
       font-size: 13px;
-      border: 1px solid #e5e9ef;
+      border: 0.5px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1));
+      border: 1px solid var(--r-neutral-line, rgba(255, 255, 255, 0.1));
       box-shadow: none;
       .chain-icon-comp {
         width: 16px;
@@ -66,7 +69,7 @@ const ConnectWrapper = styled.div`
       }
     }
     .connect-card {
-      background: #f5f6fa;
+      background: var(--r-neutral-card-2, rgba(255, 255, 255, 0.06));
       border-radius: 8px;
       padding: 20px;
       display: flex;
@@ -80,7 +83,7 @@ const ConnectWrapper = styled.div`
         font-size: 22px;
         line-height: 26px;
         text-align: center;
-        color: #13141a;
+        color: var(--r-neutral-title-1, #192945);
       }
     }
   }
@@ -95,9 +98,9 @@ const Footer = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
-  border-top: 1px solid #e5e9ef;
+  border-top: 1px solid var(--r-neutral-card-2, rgba(255, 255, 255, 0.06));
   width: 100%;
-  background-color: #fff;
+  background: var(--r-neutral-card-1, #fff);
   .ant-btn {
     width: 100%;
     height: 52px;
@@ -586,6 +589,26 @@ const Connect = ({ params: { icon, origin } }: ConnectProps) => {
     setRuleDrawerVisible(true);
   };
 
+  const [
+    displayBlockedRequestApproval,
+    setDisplayBlockedRequestApproval,
+  ] = React.useState<boolean>(false);
+  const { activePopup, setData } = useCommonPopupView();
+
+  React.useEffect(() => {
+    wallet
+      .checkNeedDisplayBlockedRequestApproval()
+      .then(setDisplayBlockedRequestApproval);
+  }, []);
+
+  const activeCancelPopup = () => {
+    setData({
+      onCancel: handleCancel,
+      displayBlockedRequestApproval,
+    });
+    activePopup('CancelConnect');
+  };
+
   return (
     <Spin spinning={isLoading}>
       <ConnectWrapper>
@@ -709,11 +732,21 @@ const Connect = ({ params: { icon, origin } }: ConnectProps) => {
               <Button
                 type="primary"
                 ghost
-                className="rabby-btn-ghost"
+                className={clsx(
+                  'rabby-btn-ghost',
+                  'flex items-center justify-center gap-2'
+                )}
                 size="large"
-                onClick={handleCancel}
+                onClick={
+                  displayBlockedRequestApproval
+                    ? activeCancelPopup
+                    : handleCancel
+                }
               >
                 {connectBtnStatus.cancelBtnText}
+                {displayBlockedRequestApproval && (
+                  <ArrowDownSVG className="w-16" />
+                )}
               </Button>
             </div>
           </Footer>

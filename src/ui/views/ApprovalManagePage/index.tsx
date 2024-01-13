@@ -65,6 +65,8 @@ import NetSwitchTabs, {
   useSwitchNetTab,
 } from '@/ui/component/PillsSwitch/NetSwitchTabs';
 import { useTranslation } from 'react-i18next';
+import { useCurrentAccount } from '@/ui/hooks/backgroundState/useAccount';
+import { useTitle } from 'ahooks';
 
 const DEFAULT_SORT_ORDER = 'descend';
 function getNextSort(currentSort?: 'ascend' | 'descend' | null) {
@@ -809,7 +811,10 @@ function getColumnsForAsset({
                   <img
                     onClick={(evt) => {
                       evt.stopPropagation();
-                      openScanLinkFromChainItem(chainItem?.scanLink, asset.id);
+                      openScanLinkFromChainItem(
+                        chainItem?.scanLink,
+                        spender.id
+                      );
                     }}
                     src={IconExternal}
                     className={clsx('ml-6 w-[16px] h-[16px] cursor-pointer')}
@@ -1009,27 +1014,14 @@ function TableByAssetSpenders({
 }
 
 const ApprovalManagePage = () => {
-  useEffect(() => {
-    const listener = (payload: any) => {
-      // message.info({
-      //   type: 'info',
-      //   content: (
-      //     <span className="text-white">
-      //       Switching to a new address. Please wait for the page to refresh.
-      //     </span>
-      //   ),
-      // });
-      // setTimeout(() => {
-      //   window.location.reload();
-      // }, 1200);
-      window.location.reload();
-    };
-    eventBus.addEventListener('accountsChanged', listener);
-
-    return () => {
-      eventBus.removeEventListener('accountsChanged', listener);
-    };
-  }, []);
+  useTitle('Approvals - Rabby Wallet');
+  useCurrentAccount({
+    onChanged: useCallback((ctx) => {
+      if (ctx.reason === 'currentAccount') {
+        window.location.reload();
+      }
+    }, []),
+  });
 
   const { t } = useTranslation();
 
